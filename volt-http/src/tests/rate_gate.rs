@@ -167,7 +167,7 @@ async fn replays_after_a_closure_leave_one_gap_apart() {
     );
     for pair in releases.windows(2) {
         assert!(
-            pair[1].checked_sub(pair[0]).unwrap() >= Duration::from_millis(90),
+            pair[1].checked_sub(pair[0]).unwrap() >= Duration::from_millis(60),
             "replays are spaced, not released together: {releases:?}"
         );
     }

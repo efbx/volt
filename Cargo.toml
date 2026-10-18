@@ -21,10 +21,10 @@ license = "MIT"
 repository = "https://github.com/efbx/volt"
 
 [workspace.dependencies]
-volt-chrome = { path = "volt-chrome" }
-volt-coerce = { path = "volt-coerce" }
-volt-coerce-macros = { path = "volt-coerce-macros" }
-volt-stringx = { path = "volt-stringx" }
+volt-chrome = { path = "volt-chrome", version = "0.5.0" }
+volt-coerce = { path = "volt-coerce", version = "0.5.0" }
+volt-coerce-macros = { path = "volt-coerce-macros", version = "0.5.0" }
+volt-stringx = { path = "volt-stringx", version = "0.5.0" }
 aho-corasick = "1.1.5"
 async-trait = "0.1.92"
 base64 = "0.23.1"
