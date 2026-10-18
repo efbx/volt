@@ -1,0 +1,42 @@
+[package]
+name = "volt-creds"
+description = "Credential identities read from the environment or the OS keyring behind one reader and writer interface"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["credentials", "keyring", "secrets", "environment", "login"]
+categories = ["authentication", "config"]
+
+[features]
+keyring-tests = []
+
+[dependencies]
+volt-stringx = { workspace = true }
+keyring = { workspace = true }
+keyring-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[lints.rust]
+unsafe_code = "allow"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+redundant_clone = "warn"
+needless_collect = "warn"
+or_fun_call = "warn"
+format_push_string = "warn"
+implicit_clone = "warn"
+inefficient_to_string = "warn"
+format_collect = "warn"
+assigning_clones = "warn"
+needless_pass_by_value = "warn"
+unnecessary_to_owned = "warn"
+redundant_allocation = "warn"

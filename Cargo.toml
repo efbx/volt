@@ -1,0 +1,70 @@
+[workspace]
+resolver = "3"
+members = [
+    "volt-chrome",
+    "volt-coerce",
+    "volt-coerce-macros",
+    "volt-creds",
+    "volt-filex",
+    "volt-http",
+    "volt-slicex",
+    "volt-stringx",
+    "volt-templater",
+    "volt-timestamp",
+]
+
+[workspace.package]
+version = "0.5.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+repository = "https://github.com/efbx/volt"
+
+[workspace.dependencies]
+volt-chrome = { path = "volt-chrome" }
+volt-coerce = { path = "volt-coerce" }
+volt-coerce-macros = { path = "volt-coerce-macros" }
+volt-stringx = { path = "volt-stringx" }
+aho-corasick = "1.1.5"
+async-trait = "0.1.92"
+base64 = "0.23.1"
+bytes = "1.12.1"
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+chromiumoxide = { version = "0.9.1", default-features = false }
+futures = "0.3.34"
+futures-util = "0.3.34"
+http = "1.5.0"
+httpdate = "1.0.3"
+keyring = "4.2.0"
+keyring-core = "1.0.1"
+proc-macro2 = "1.0.107"
+quote = "1.0.47"
+rand = "0.10.3"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+syn = { version = "3.0.9", features = ["full", "visit-mut"] }
+thiserror = "2.0.21"
+tokio = { version = "1.53.3", features = ["time", "sync", "rt-multi-thread"] }
+url = "2.5.8"
+wreq = { version = "6.0.0-rc.31", features = ["json", "cookies", "gzip", "brotli", "zstd", "deflate", "charset", "form", "query", "multipart", "stream"] }
+wreq-util = "3.0.0-rc.14"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+redundant_clone = "warn"
+needless_collect = "warn"
+or_fun_call = "warn"
+format_push_string = "warn"
+implicit_clone = "warn"
+inefficient_to_string = "warn"
+format_collect = "warn"
+assigning_clones = "warn"
+needless_pass_by_value = "warn"
+unnecessary_to_owned = "warn"
+redundant_allocation = "warn"

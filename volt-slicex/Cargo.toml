@@ -1,0 +1,16 @@
+[package]
+name = "volt-slicex"
+description = "Stable in-place deduplication for vectors of comparable items"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["vec", "dedup", "slice", "unique", "stable"]
+categories = ["algorithms", "data-structures"]
+
+[dependencies]
+
+[lints]
+workspace = true

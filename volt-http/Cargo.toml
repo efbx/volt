@@ -1,0 +1,37 @@
+[package]
+name = "volt-http"
+description = "An HTTP client on wreq with middleware for bearer tokens, rate gates, retries, redirects and browser cookie solving"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["http", "client", "middleware", "retry", "scraping"]
+categories = ["web-programming::http-client", "network-programming"]
+
+[features]
+chrome = ["dep:volt-chrome", "tokio/rt"]
+
+[dependencies]
+async-trait = { workspace = true }
+base64 = { workspace = true }
+bytes = { workspace = true }
+volt-chrome = { workspace = true, optional = true }
+futures-util = { workspace = true }
+http = { workspace = true }
+httpdate = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+wreq = { workspace = true }
+wreq-util = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[lints]
+workspace = true

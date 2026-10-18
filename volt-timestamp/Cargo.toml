@@ -1,0 +1,22 @@
+[package]
+name = "volt-timestamp"
+description = "Nanosecond, microsecond, millisecond and second timestamps with lenient parsing and conversions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["timestamp", "time", "nanoseconds", "epoch", "parsing"]
+categories = ["date-and-time"]
+
+[dependencies]
+chrono = { workspace = true }
+volt-coerce = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

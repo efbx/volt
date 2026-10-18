@@ -1,0 +1,17 @@
+[package]
+name = "volt-filex"
+description = "Path sanitising, existence checks, safe copies and next-available file names"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["filesystem", "path", "sanitize", "filename", "copy"]
+categories = ["filesystem"]
+
+[dependencies]
+volt-stringx = { workspace = true }
+
+[lints]
+workspace = true

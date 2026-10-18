@@ -1,0 +1,22 @@
+[package]
+name = "volt-coerce-macros"
+description = "The #[coerce] attribute for volt-coerce: lenient JSON reading on top of serde"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["serde", "json", "lenient", "coerce", "macro"]
+categories = ["encoding", "development-tools::procedural-macro-helpers"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
+
+[lints]
+workspace = true

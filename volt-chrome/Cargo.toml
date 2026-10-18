@@ -1,0 +1,20 @@
+[package]
+name = "volt-chrome"
+description = "Headless Chrome sessions over chromiumoxide with a persistent profile, timeouts and cookie capture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["chrome", "headless", "browser", "cookies", "chromiumoxide"]
+categories = ["web-programming", "development-tools"]
+
+[dependencies]
+chromiumoxide = { workspace = true }
+futures = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt"] }
+
+[lints]
+workspace = true

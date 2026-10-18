@@ -1,0 +1,17 @@
+[package]
+name = "volt-stringx"
+description = "Blank checks, symbol normalisation, in-place string edits and non-blank joins for str and String"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["string", "text", "normalize", "blank", "unicode"]
+categories = ["text-processing"]
+
+[dependencies]
+aho-corasick = { workspace = true }
+
+[lints]
+workspace = true
