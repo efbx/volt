@@ -301,6 +301,7 @@ impl ClientBuilder {
 
     /// Sets `TCP_USER_TIMEOUT` on every socket; `None` leaves the option unset.
     #[cfg(any(target_os = "android", target_os = "fuchsia", target_os = "linux"))]
+    #[must_use]
     pub fn tcp_user_timeout<D>(mut self, value: D) -> Self
     where
         D: Into<Option<Duration>>,
