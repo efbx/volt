@@ -10,8 +10,8 @@ use super::{
 ///
 /// Several managers may share one provider; each reads and writes only its own label.
 pub struct Manager {
-    label: String,
-    provider: Arc<dyn IdentityProvider>,
+    pub(super) label: Arc<str>,
+    pub(super) provider: Arc<dyn IdentityProvider>,
 }
 
 impl Debug for Manager {
@@ -26,7 +26,7 @@ impl Manager {
     /// Creates a manager for `label` over `provider`.
     pub fn new(provider: Arc<dyn IdentityProvider>, label: &str) -> Self {
         Self {
-            label: label.to_string(),
+            label: label.into(),
             provider,
         }
     }
@@ -101,7 +101,7 @@ impl IdentityWriter for Manager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::*;
+    use crate::{EnvProvider, IdentityManager};
     use std::sync::Arc;
 
     struct ManagerSuite<'a> {
@@ -372,6 +372,7 @@ mod tests {
     #[cfg(feature = "keyring-tests")]
     mod keyring_tests {
         use super::*;
+        use crate::KeyProvider;
         use std::sync::Arc;
 
         const NOT_FOUND: fn(&CredError) -> bool = |e| matches!(e, CredError::NoIdentity(_));

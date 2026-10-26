@@ -20,7 +20,7 @@ Written for one task, getting past browser challenges that plain HTTP clients ca
 
 ```toml
 [dependencies]
-volt-chrome = { git = "https://github.com/efbx/volt", tag = "v0.5.0" }
+volt-chrome = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 

@@ -28,7 +28,7 @@ Each crate is a workspace member, so Cargo finds it by package name in this repo
 
 ```toml
 [dependencies]
-volt-http = { git = "https://github.com/efbx/volt", tag = "v0.5.0" }
+volt-http = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
 ```
 
 Every crate requires Rust 1.95 or newer.

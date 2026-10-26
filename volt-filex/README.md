@@ -17,7 +17,7 @@ Small file-system helpers for programs that write user-named files: sanitise a n
 
 ```toml
 [dependencies]
-volt-filex = { git = "https://github.com/efbx/volt", tag = "v0.5.0" }
+volt-filex = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
 ```
 
 Requires Rust 1.95 or newer.

@@ -11,15 +11,21 @@ keywords = ["credentials", "keyring", "secrets", "environment", "login"]
 categories = ["authentication", "config"]
 
 [features]
+async = ["dep:async-trait", "dep:tokio"]
 keyring-tests = []
 
 [dependencies]
 volt-stringx = { workspace = true }
+async-trait = { workspace = true, optional = true }
 keyring = { workspace = true }
 keyring-core = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+tokio = { workspace = true, optional = true, features = ["rt"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
 
 [lints.rust]
 unsafe_code = "allow"

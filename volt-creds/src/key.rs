@@ -165,7 +165,7 @@ impl IdentityProvider for KeyProvider {
 #[cfg(all(test, feature = "keyring-tests"))]
 mod keyring_tests {
     use super::*;
-    use crate::*;
+    use crate::{IdentityReader, IdentityWriter, Manager};
     use std::collections::HashMap;
     use std::sync::Arc;
 

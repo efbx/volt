@@ -5,11 +5,15 @@
 //! [`IdentityWriter`] and [`IdentityManager`] over it. [`EnvProvider`] keeps each [`Identity`] in
 //! environment variables, [`KeyProvider`] keeps every label of an application in one OS keyring
 //! entry, [`Mode`] picks between the two, [`Cached`] wraps either so each label is read from it
-//! once, and every failure is a [`CredError`].
+//! once, and every failure is a [`CredError`]. With the `async` feature, `AsyncIdentityReader`
+//! and `AsyncIdentityWriter` give async callers the same reads and writes, run on the blocking
+//! pool of the current tokio runtime.
 
 #![warn(missing_docs)]
 
 mod access;
+#[cfg(feature = "async")]
+mod async_access;
 mod cached;
 mod env;
 mod error;
@@ -19,6 +23,8 @@ mod manager;
 mod provider;
 
 pub use access::{IdentityManager, IdentityReader, IdentityWriter};
+#[cfg(feature = "async")]
+pub use async_access::{AsyncIdentityReader, AsyncIdentityWriter};
 pub use cached::Cached;
 pub use env::EnvProvider;
 pub use error::CredError;

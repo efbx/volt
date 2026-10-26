@@ -2503,7 +2503,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "volt-chrome"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "chromiumoxide",
  "futures",
@@ -2513,7 +2513,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -2522,7 +2522,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce-macros"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2531,26 +2531,28 @@ dependencies = [
 
 [[package]]
 name = "volt-creds"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
+ "async-trait",
  "keyring",
  "keyring-core",
  "serde",
  "serde_json",
  "thiserror",
+ "tokio",
  "volt-stringx",
 ]
 
 [[package]]
 name = "volt-filex"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "volt-stringx",
 ]
 
 [[package]]
 name = "volt-http"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -2571,25 +2573,25 @@ dependencies = [
 
 [[package]]
 name = "volt-slicex"
-version = "0.5.0"
+version = "0.5.1"
 
 [[package]]
 name = "volt-stringx"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-templater"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-timestamp"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "chrono",
  "serde",

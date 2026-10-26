@@ -10,6 +10,7 @@ Site credentials behind one small interface. A program asks a `Manager` for the 
 - **`Identity`**: a user and a secret. **`IdentityPayload`**: the optional pair used when writing one half; each half borrows its text or owns it, so writes copy nothing and an owned payload can be kept as `IdentityPayload<'static>`.
 - **`IdentityReader`, `IdentityWriter`, `IdentityManager`**: the traits a consumer depends on. `present()` tells whether a label has credentials without reading them.
 - **`Manager`**: implements all three for one label over any `IdentityProvider`, so a fetcher receives an `Arc<dyn IdentityReader>` and never sees the storage.
+- **`AsyncIdentityReader`, `AsyncIdentityWriter`** (feature `async`): `get`, `get_user`, `present`, `set_payload` and `delete` for async callers, implemented by `Manager`. Each call runs the provider on the blocking pool of the current tokio runtime through `tokio::task::spawn_blocking`, so it works on any tokio runtime and starts no runtime or thread pool of its own.
 - **`EnvProvider`**: reads `<LABEL>_USERNAME` and `<LABEL>_PASSWORD`, upper-cased, from the environment. Writing sets or removes the variables for the process.
 - **`KeyProvider`**: keeps every label of one application in a single entry of the OS keyring, as a map of label to user and secret, through the `keyring` crate's native store.
 - **`Cached`**: wraps any provider so each label is read from it once and served from memory afterwards. Writes and removals go to the wrapped provider first and update memory only when they succeed.
@@ -20,10 +21,10 @@ Site credentials behind one small interface. A program asks a `Manager` for the 
 
 ```toml
 [dependencies]
-volt-creds = { git = "https://github.com/efbx/volt", tag = "v0.5.0" }
+volt-creds = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
 ```
 
-Requires Rust 1.95 or newer. The keyring tests touch the real OS keyring and only run with the `keyring-tests` feature. This crate is the one member of the workspace that allows `unsafe` code, for the two standard-library calls that set and remove environment variables.
+Requires Rust 1.95 or newer. Add `features = ["async"]` for the async traits; without it the crate does not depend on tokio. The keyring tests touch the real OS keyring and only run with the `keyring-tests` feature. This crate is the one member of the workspace that allows `unsafe` code, for the two standard-library calls that set and remove environment variables.
 
 ## Example
 
