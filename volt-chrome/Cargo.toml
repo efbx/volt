@@ -1,6 +1,6 @@
 [package]
 name = "volt-chrome"
-description = "Headless Chrome sessions over chromiumoxide with a persistent profile, timeouts and cookie capture"
+description = "Chrome over chromiumoxide, launched without announcing itself as automated, as an engine of volt-browser"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -11,10 +11,18 @@ keywords = ["chrome", "headless", "browser", "cookies", "chromiumoxide"]
 categories = ["web-programming", "development-tools"]
 
 [dependencies]
+async-trait = { workspace = true }
 chromiumoxide = { workspace = true }
 futures = { workspace = true }
+serde_json = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["rt"] }
+tokio = { workspace = true }
+url = { workspace = true }
+volt-browser = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros"] }
+volt-browser-checks = { workspace = true }
 
 [lints]
 workspace = true

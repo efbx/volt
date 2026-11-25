@@ -1,0 +1,11 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Inner</title>
+<input name="inside">
+<button id="in">Inside</button>
+<p id="echo"></p>
+<script>
+  document.getElementById("in").addEventListener("click", function () {
+    document.getElementById("echo").textContent = document.querySelector("input").value;
+  });
+</script>

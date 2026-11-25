@@ -1,0 +1,59 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Form</title>
+<form id="login" action="/submitted" method="get">
+  <label for="email">Email address</label>
+  <input id="email" name="email" type="email" placeholder="you@example.com">
+  <label>Password <input name="password" type="password"></label>
+  <input name="age" type="number">
+  <textarea name="note" aria-label="Note for us"></textarea>
+  <label><input type="checkbox" name="news" value="yes"> Send news</label>
+  <label><input type="radio" name="plan" value="free" checked> Free</label>
+  <label><input type="radio" name="plan" value="paid"> Paid</label>
+  <select name="language">
+    <option value="en">English</option>
+    <option value="de">German</option>
+    <option value="fr">French</option>
+  </select>
+  <select name="toppings" multiple>
+    <option value="a">Olives</option>
+    <option value="b">Onions</option>
+    <option value="c">Peppers</option>
+  </select>
+  <input name="locked" value="fixed" readonly>
+  <input name="off" value="x" disabled>
+  <div id="rich" contenteditable="true" style="min-height: 20px; border: 1px solid"></div>
+  <button type="button" id="count" data-testid="counter" title="Counts clicks">Clicked 0 times</button>
+  <button type="submit">Sign in</button>
+</form>
+<p id="log" style="color: rgb(1, 2, 3)"></p>
+<script>
+  var log = [];
+  var clicks = 0;
+  var counter = document.getElementById("count");
+  var email = document.getElementById("email");
+  function note(text) {
+    log.push(text);
+    document.getElementById("log").textContent = log.join(" ");
+  }
+  counter.addEventListener("click", function (event) {
+    clicks += 1;
+    counter.textContent = "Clicked " + clicks + " times";
+    note("click:" + event.detail + (event.shiftKey ? ":shift" : ""));
+  });
+  counter.addEventListener("dblclick", function () {
+    note("dblclick");
+  });
+  counter.addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+    note("contextmenu");
+  });
+  counter.addEventListener("mouseover", function () {
+    note("over");
+  });
+  ["focus", "blur", "input", "change", "keydown", "keyup"].forEach(function (type) {
+    email.addEventListener(type, function (event) {
+      note(type + (event.key ? ":" + event.key : ""));
+    });
+  });
+</script>

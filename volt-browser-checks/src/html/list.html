@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>List</title>
+<h1>Teas</h1>
+<ul id="teas">
+  <li class="tea">Green <b>tea</b></li>
+  <li class="tea">Black tea</li>
+  <li class="tea" hidden>Hidden tea</li>
+  <li class="tea"><a href="/next">Next page</a></li>
+</ul>
+<img alt="A cup of tea" width="10" height="10" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+<input type="button" value="Brew">
+<p id="note">Fresh <span hidden>stale</span></p>
+<div id="tall" style="height: 3000px"></div>
+<button id="far">Far below</button>
+<p id="out"></p>
+<script>
+  document.getElementById("far").addEventListener("click", function () {
+    document.getElementById("out").textContent = "reached";
+  });
+</script>

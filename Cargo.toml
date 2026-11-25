@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
 members = [
+    "volt-browser",
+    "volt-browser-checks",
     "volt-chrome",
     "volt-coerce",
     "volt-coerce-macros",
@@ -11,43 +13,60 @@ members = [
     "volt-stringx",
     "volt-templater",
     "volt-timestamp",
+    "volt-webview",
 ]
 
 [workspace.package]
-version = "0.5.1"
+version = "0.6.0"
 edition = "2024"
 rust-version = "1.95"
 license = "MIT"
 repository = "https://github.com/efbx/volt"
 
 [workspace.dependencies]
-volt-chrome = { path = "volt-chrome", version = "0.5.1" }
-volt-coerce = { path = "volt-coerce", version = "0.5.1" }
-volt-coerce-macros = { path = "volt-coerce-macros", version = "0.5.1" }
-volt-stringx = { path = "volt-stringx", version = "0.5.1" }
+volt-browser = { path = "volt-browser", version = "0.6.0" }
+volt-browser-checks = { path = "volt-browser-checks", version = "0.6.0" }
+volt-chrome = { path = "volt-chrome", version = "0.6.0" }
+volt-coerce = { path = "volt-coerce", version = "0.6.0" }
+volt-coerce-macros = { path = "volt-coerce-macros", version = "0.6.0" }
+volt-stringx = { path = "volt-stringx", version = "0.6.0" }
 aho-corasick = "1.1.5"
 async-trait = "0.1.92"
 base64 = "0.23.1"
-bytes = "1.12.1"
+bytes = "1.12.2"
 chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
 chromiumoxide = { version = "0.9.1", default-features = false }
+dispatch2 = "0.3.1"
 futures = "0.3.34"
 futures-util = "0.3.34"
+glib-unix = "0.22.8"
+gtk = "0.19.0"
 http = "1.5.0"
 httpdate = "1.0.3"
+javascriptcore-rs = { version = "2.0.0", features = ["v2_28"] }
+keyboard-types = "0.8.3"
 keyring = "4.2.0"
-keyring-core = "1.0.1"
+keyring-core = "1.1.0"
+objc2 = "0.6.5"
+objc2-app-kit = { version = "0.3.2", default-features = false, features = ["std"] }
+objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std"] }
+objc2-foundation = { version = "0.3.2", default-features = false, features = ["std"] }
 proc-macro2 = "1.0.107"
 quote = "1.0.47"
-rand = "0.10.3"
+rand = "0.10.4"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-syn = { version = "3.0.9", features = ["full", "visit-mut"] }
+soup3 = "0.9.0"
+syn = { version = "3.0.10", features = ["full", "visit-mut"] }
+tao = "0.38.0"
 thiserror = "2.0.21"
-tokio = { version = "1.53.3", features = ["time", "sync", "rt-multi-thread"] }
-url = "2.5.8"
+tokio = { version = "1.54.1", features = ["time", "sync", "rt-multi-thread"] }
+url = "2.5.9"
+webkit2gtk = { version = "3.0.0", features = ["v2_40"] }
+windows = "0.62.2"
 wreq = { version = "6.0.0-rc.31", features = ["json", "cookies", "gzip", "brotli", "zstd", "deflate", "charset", "form", "query", "multipart", "stream"] }
 wreq-util = "3.0.0-rc.14"
+wry = { version = "0.57.3", default-features = false }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

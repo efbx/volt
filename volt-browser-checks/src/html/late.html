@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Late</title>
+<button id="soon" disabled>Soon</button>
+<p id="out"></p>
+<div style="position: relative; width: 200px; height: 40px">
+  <button id="under" style="width: 200px; height: 40px">Under</button>
+  <div id="lid" style="position: absolute; inset: 0"></div>
+</div>
+<button id="ghost" style="visibility: hidden">Ghost</button>
+<div id="veil" style="position: fixed; inset: 0 0 50% 0; background: #fff"></div>
+<script>
+  document.getElementById("soon").addEventListener("click", function () {
+    document.getElementById("out").textContent = "clicked";
+  });
+  setTimeout(function () {
+    document.getElementById("soon").disabled = false;
+  }, 300);
+  setTimeout(function () {
+    var arrived = document.createElement("p");
+    arrived.id = "arrived";
+    arrived.textContent = "Arrived";
+    document.body.appendChild(arrived);
+  }, 400);
+  setTimeout(function () {
+    document.getElementById("veil").remove();
+  }, 600);
+  window.later = function (wait, value) {
+    return new Promise(function (done) {
+      setTimeout(function () {
+        done(value);
+      }, wait);
+    });
+  };
+  window.refuse = function () {
+    return Promise.reject(new Error("refused"));
+  };
+</script>

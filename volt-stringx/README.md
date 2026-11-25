@@ -21,7 +21,7 @@ The traits are implemented on the standard types, so importing them is the whole
 
 ```toml
 [dependencies]
-volt-stringx = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
+volt-stringx = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
 ```
 
 Requires Rust 1.95 or newer.

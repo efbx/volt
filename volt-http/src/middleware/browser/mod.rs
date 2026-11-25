@@ -1,6 +1,6 @@
-mod browser_chrome;
 mod builder;
 mod cloudflare;
+mod solver;
 
-pub use browser_chrome::{Browser, Detect, Detector};
 pub use builder::BrowserBuilder;
+pub use solver::{Browser, Detect, Detector};

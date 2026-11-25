@@ -1,21 +1,20 @@
-//! A Chrome session over chromiumoxide that launches without announcing itself as
-//! automated.
+//! Chrome as an engine of [`volt_browser`], over chromiumoxide and launched without announcing
+//! itself as automated.
 //!
-//! [`Session`] starts the browser from [`Options`], drives its event loop on the tokio
-//! runtime, opens pages and shuts it down; [`Session::run`] does all of that around one
-//! job. Failures come back as [`Error`], and chromiumoxide's [`Browser`], [`Page`] and
-//! [`Cookie`] are re-exported so callers need not depend on it directly.
+//! [`Chrome`] launches the browser and returns a [`volt_browser::Session`], whose pages take
+//! every selector, action and storage command of that crate. Every failure is a
+//! [`volt_browser::Error`]; what only Chrome can fail with, as a launch that finds no binary or
+//! a `DevTools` protocol call chromiumoxide gives up on, is its
+//! [`Engine`](volt_browser::Error::Engine) kind, with the reason as its message.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
+mod chrome;
 mod error;
 mod options;
 mod profile;
 mod session;
+mod tab;
 
-pub use chromiumoxide::Page;
-pub use chromiumoxide::browser::Browser;
-pub use chromiumoxide::cdp::browser_protocol::network::Cookie;
-pub use error::Error;
-pub use options::{DEFAULT_TIMEOUT, Options};
-pub use session::Session;
+pub use chrome::Chrome;

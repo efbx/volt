@@ -11,13 +11,13 @@ keywords = ["http", "client", "middleware", "retry", "scraping"]
 categories = ["web-programming::http-client", "network-programming"]
 
 [features]
-chrome = ["dep:volt-chrome", "tokio/rt"]
+browser = ["dep:volt-browser", "tokio/rt"]
 
 [dependencies]
 async-trait = { workspace = true }
 base64 = { workspace = true }
 bytes = { workspace = true }
-volt-chrome = { workspace = true, optional = true }
+volt-browser = { workspace = true, optional = true }
 futures-util = { workspace = true }
 http = { workspace = true }
 httpdate = { workspace = true }
@@ -32,6 +32,7 @@ wreq-util = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+volt-chrome = { workspace = true }
 
 [lints]
 workspace = true

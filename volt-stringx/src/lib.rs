@@ -5,6 +5,7 @@
 //! `String` in place without reallocating when it can, and [`StrsExt`] joins a
 //! slice of `&str` while skipping the entries a predicate rejects.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 mod normalizer;

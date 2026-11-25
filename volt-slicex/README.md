@@ -17,7 +17,7 @@ One extension trait for `Vec<T>`: remove repeats while keeping the first occurre
 
 ```toml
 [dependencies]
-volt-slicex = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
+volt-slicex = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
 ```
 
 Requires Rust 1.95 or newer.

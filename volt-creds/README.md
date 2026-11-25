@@ -21,14 +21,14 @@ Site credentials behind one small interface. A program asks a `Manager` for the 
 
 ```toml
 [dependencies]
-volt-creds = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
+volt-creds = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
 ```
 
 Requires Rust 1.95 or newer. Add `features = ["async"]` for the async traits; without it the crate does not depend on tokio. The keyring tests touch the real OS keyring and only run with the `keyring-tests` feature. This crate is the one member of the workspace that allows `unsafe` code, for the two standard-library calls that set and remove environment variables.
 
 ## Example
 
-```rust
+```rust,no_run
 use std::sync::Arc;
 
 use volt_creds::{EnvProvider, IdentityReader, Manager};

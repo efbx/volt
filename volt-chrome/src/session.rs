@@ -1,71 +1,46 @@
-use std::future::Future;
 use std::path::Path;
+use std::time::Duration;
 
+use chromiumoxide::Page;
+use chromiumoxide::browser::Browser;
 use futures::StreamExt;
 use tokio::task::JoinHandle;
+use tokio::time;
 
-use super::profile::TempProfile;
-use super::{Browser, Error, Options, Page};
+use super::error::Error;
+use super::options::Options;
+
+/// How long quitting waits for the browser's process to end.
+const QUIT_GRACE: Duration = Duration::from_secs(5);
 
 /// A running browser and the task driving its event loop, which stops when the session
-/// is closed or dropped.
+/// is quit or dropped.
 #[derive(Debug)]
-pub struct Session {
+pub(super) struct Session {
     browser: Browser,
     events: JoinHandle<()>,
 }
 
 impl Session {
-    /// Launches the browser described by `options` and starts its event loop on the tokio
-    /// runtime.
-    pub async fn launch(options: Options) -> Result<Self, Error> {
-        Self::launch_with_profile(&options, None).await
-    }
-
-    /// Launches a browser with a temporary profile, hands one blank page to `extractor`,
-    /// closes the browser and returns what `extractor` returned.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Timeout`] when opening the page and running `extractor` together
-    /// take longer than `options.timeout`, besides any launch or page error.
-    pub async fn run<T, F, Fut>(options: Options, extractor: F) -> Result<T, Error>
-    where
-        F: FnOnce(Page) -> Fut,
-        Fut: Future<Output = Result<T, Error>>,
-    {
-        let profile = TempProfile::create();
-        let session = Self::launch_with_profile(&options, Some(profile.path())).await?;
-        let outcome = tokio::time::timeout(options.timeout, async {
-            let page = session.new_page().await?;
-            extractor(page).await
-        })
-        .await;
-        session.close().await;
-        outcome.map_err(|_| Error::Timeout(options.timeout))?
-    }
-
-    /// Launches the browser with `profile` as its user data directory when given, and
-    /// spawns the task that drives its events.
-    async fn launch_with_profile(options: &Options, profile: Option<&Path>) -> Result<Self, Error> {
-        let (browser, mut handler) = Browser::launch(options.build_config(profile)?).await?;
+    /// Launches the browser described by `options` with `profile` as its user data directory,
+    /// and spawns the task that drives its events on the tokio runtime.
+    pub(super) async fn launch(options: &Options, profile: &Path) -> Result<Self, Error> {
+        let config = options.build_config(profile)?;
+        let (browser, mut handler) = Browser::launch(config).await?;
         let events = tokio::spawn(async move { while handler.next().await.is_some() {} });
         Ok(Self { browser, events })
     }
 
-    /// Returns the chromiumoxide browser handle.
-    #[must_use]
-    pub fn browser(&self) -> &Browser {
-        &self.browser
-    }
-
     /// Opens a new tab on `about:blank`.
-    pub async fn new_page(&self) -> Result<Page, Error> {
+    pub(super) async fn new_page(&self) -> Result<Page, Error> {
         Ok(self.browser.new_page("about:blank").await?)
     }
 
-    /// Stops the event loop, waits for it to end and shuts the browser down.
-    pub async fn close(mut self) {
+    /// Asks the browser to quit and waits, a few seconds at most, until its process has ended,
+    /// so that nothing writes to its profile any more; then stops the event loop.
+    pub(super) async fn quit(mut self) {
+        let _ = self.browser.close().await;
+        let _ = time::timeout(QUIT_GRACE, self.browser.wait()).await;
         self.events.abort();
         let _ = (&mut self.events).await;
     }

@@ -4,6 +4,7 @@
 //! occurrence of each in its original position, scanning short vectors and
 //! hashing long ones.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 use std::collections::HashSet;

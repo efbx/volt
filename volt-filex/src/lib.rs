@@ -7,6 +7,7 @@
 //! [`Entry`], [`FileType`], [`FILE_PERMISSION`] and [`DIRECTORY_PERMISSION`] name the
 //! entry kinds, file kinds and Unix modes.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 mod next_available;

@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Frame</title>
+<iframe id="inner" src="/inner" width="300" height="120"></iframe>
+<div id="host"></div>
+<script>
+  var root = document.getElementById("host").attachShadow({ mode: "open" });
+  root.innerHTML = '<button id="deep">Deep</button><span id="said"></span>';
+  root.getElementById("deep").addEventListener("click", function () {
+    root.getElementById("said").textContent = "pressed";
+  });
+</script>

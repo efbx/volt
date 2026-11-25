@@ -6,6 +6,7 @@
 //! [`Reader`] runs those rules from any serde deserializer, [`Json`] decodes a JSON document
 //! stored inside a string, and [`AfterOutcome`] is what a `#[coerce(after = …)]` hook returns.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 #![expect(
     clippy::cast_possible_truncation,

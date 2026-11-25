@@ -18,7 +18,7 @@ Meant for user-editable patterns such as file names and export paths, where the 
 
 ```toml
 [dependencies]
-volt-templater = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
+volt-templater = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
 ```
 
 Requires Rust 1.95 or newer.

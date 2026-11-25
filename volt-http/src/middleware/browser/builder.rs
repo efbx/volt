@@ -1,17 +1,17 @@
 use std::fmt::{self, Debug};
 use std::future::Future;
-use std::path::PathBuf;
 use std::sync::atomic::AtomicU64;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
 use tokio::sync::Mutex;
+use volt_browser::{Page, Session, Settings};
 use wreq::cookie::Jar;
 
-use super::browser_chrome::{Action, ActionFuture, Browser, ChromePath, Detect, Detector};
-use volt_chrome::Page;
+use super::solver::{Action, ActionFuture, Browser, Detect, Detector, Launch, Launching};
 
-/// Builds a [`Browser`] around the cookie jar its solved cookies go into.
+/// Builds a [`Browser`] around the cookie jar its solved cookies go into and the browser it
+/// solves in.
 pub struct BrowserBuilder {
     jar: Arc<Jar>,
     cookie_domain: String,
@@ -19,7 +19,7 @@ pub struct BrowserBuilder {
     recovery_url: Option<String>,
     detect: Detector,
     action: Action,
-    chrome_path: ChromePath,
+    launch: Launch,
     headed: bool,
     timeout: Duration,
 }
@@ -37,9 +37,15 @@ impl Debug for BrowserBuilder {
 }
 
 impl BrowserBuilder {
-    /// Returns a builder that adds cookies to `jar`, treats `403` responses as challenges, runs no
-    /// action, launches a visible Chrome and allows a solve 120 s.
-    pub fn new(jar: Arc<Jar>) -> Self {
+    /// Returns a builder that adds cookies to `jar` and solves in the browser `launch` starts,
+    /// which is any engine of volt-browser: `|settings| Chrome::default().launch(settings)` for
+    /// volt-chrome, `|settings| Webview.launch(settings)` for volt-webview. It treats `403`
+    /// responses as challenges, runs no action, opens a visible window and allows a solve 120 s.
+    pub fn new<L, Fut>(jar: Arc<Jar>, launch: L) -> Self
+    where
+        L: Fn(Settings) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = Result<Session, volt_browser::Error>> + Send + 'static,
+    {
         Self {
             jar,
             cookie_domain: String::new(),
@@ -47,14 +53,14 @@ impl BrowserBuilder {
             recovery_url: None,
             detect: Detect::forbidden,
             action: Arc::new(|_page| Box::pin(async { Ok(()) })),
-            chrome_path: Arc::new(|| None),
+            launch: Arc::new(move |settings| Box::pin(launch(settings)) as Launching),
             headed: true,
             timeout: Duration::from_secs(120),
         }
     }
 
-    /// Sets the text a Chrome cookie's domain must contain to be copied, and the `Domain` it is
-    /// stored with. Defaults to empty.
+    /// Sets the text a cookie's domain must contain to be copied, and the `Domain` it is stored
+    /// with. A leading dot does not count for the match. Defaults to empty.
     #[must_use]
     pub fn cookie_domain(mut self, domain: impl Into<String>) -> Self {
         self.cookie_domain = domain.into();
@@ -62,14 +68,14 @@ impl BrowserBuilder {
     }
 
     /// Sets the URL the cookies are stored as coming from. Defaults to the scheme and host of the
-    /// page Chrome solved.
+    /// page the browser solved.
     #[must_use]
     pub fn cookie_host(mut self, host: impl Into<String>) -> Self {
         self.cookie_host = host.into();
         self
     }
 
-    /// Sets the page Chrome opens to solve a challenge, instead of the URL of the detected
+    /// Sets the page the browser opens to solve a challenge, instead of the URL of the detected
     /// response. Required by [`Browser::recover_now`].
     #[must_use]
     pub fn recovery_url(mut self, url: impl Into<String>) -> Self {
@@ -91,31 +97,21 @@ impl BrowserBuilder {
     pub fn action<F, Fut>(mut self, action: F) -> Self
     where
         F: Fn(Page) -> Fut + Send + Sync + 'static,
-        Fut: Future<Output = Result<(), volt_chrome::Error>> + Send + 'static,
+        Fut: Future<Output = Result<(), volt_browser::Error>> + Send + 'static,
     {
         self.action = Arc::new(move |page| Box::pin(action(page)) as ActionFuture);
         self
     }
 
-    /// Sets the function asked for the Chrome binary on every solve; [`None`] leaves the choice to
-    /// volt-chrome, which is the default.
-    #[must_use]
-    pub fn chrome_path(
-        mut self,
-        provider: impl Fn() -> Option<PathBuf> + Send + Sync + 'static,
-    ) -> Self {
-        self.chrome_path = Arc::new(provider);
-        self
-    }
-
-    /// Sets whether Chrome opens a visible window. Defaults to `true`.
+    /// Sets whether the browser opens a visible window. Defaults to `true`.
     #[must_use]
     pub fn headed(mut self, headed: bool) -> Self {
         self.headed = headed;
         self
     }
 
-    /// Sets how long a solve may take once Chrome has launched before it fails. Defaults to 120 s.
+    /// Sets the most the browser's launch may take, and then the most the solve may take, before
+    /// it fails. Defaults to 120 s.
     #[must_use]
     pub fn solve_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = timeout;
@@ -131,7 +127,7 @@ impl BrowserBuilder {
             recovery_url: self.recovery_url,
             detect: self.detect,
             action: self.action,
-            chrome_path: self.chrome_path,
+            launch: self.launch,
             headed: self.headed,
             timeout: self.timeout,
             user_agent: RwLock::new(None),

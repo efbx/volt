@@ -1,0 +1,23 @@
+[package]
+name = "volt-browser-checks"
+description = "The checks every engine of volt-browser has to pass, run for real against pages of a small local site"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["browser", "automation", "testing"]
+categories = ["development-tools::testing"]
+
+[dependencies]
+http = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["io-util", "net"] }
+volt-browser = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros"] }
+
+[lints]
+workspace = true

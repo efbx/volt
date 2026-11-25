@@ -9,6 +9,7 @@
 //! and `AsyncIdentityWriter` give async callers the same reads and writes, run on the blocking
 //! pool of the current tokio runtime.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 mod access;

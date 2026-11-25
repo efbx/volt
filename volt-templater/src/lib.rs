@@ -5,6 +5,7 @@
 //! user-written template into text and tokens once, and the resulting [`CompiledTemplate`]
 //! fills them for each input; text that is not a token is copied through unchanged.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 mod compiled;

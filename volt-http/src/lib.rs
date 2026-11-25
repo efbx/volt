@@ -6,9 +6,10 @@
 //! connection pool and cookies while changing middleware or policies. Each request is a
 //! [`RequestBuilder`] with async and `_sync` senders. The [`middleware`] chain sees every request
 //! and response, [`retry`] and [`redirect`] hold the policies the client applies between sends, and
-//! every failure is one [`Error`]. The `chrome` feature adds the `Browser` middleware, which solves
-//! challenge pages in Chrome and copies the cookies into the client.
+//! every failure is one [`Error`]. The `browser` feature adds the `Browser` middleware, which
+//! solves challenge pages in a browser of volt-browser and copies the cookies into the client.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 #![expect(
     clippy::cast_possible_truncation,

@@ -8,6 +8,7 @@
 //! format. Each serialises as the plain integer and reads leniently inside a
 //! `#[coerce]` struct.
 
+#![cfg_attr(doctest, doc = include_str!("../README.md"))]
 #![warn(missing_docs)]
 
 mod micro;

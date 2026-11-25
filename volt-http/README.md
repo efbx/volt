@@ -12,7 +12,7 @@ An HTTP client for scraping and API work, built on [wreq](https://crates.io/crat
 - **Middleware**: the `Middleware` trait sees every request and response. Built in:
   - `Bearer`: a `TokenSource` logs in once, the `Token` is attached to every request and refreshed before it expires; `Anonymous` on a request skips it. `session_valid` and `login_sync` expose the state.
   - `RateGate`: a minimum gap between requests with jitter, pacing that widens after a `429` and calms down after quiet, and `trip` to back off on demand.
-  - `Browser` (feature `chrome`): detects a challenge page, solves it in Chrome through [volt-chrome](../volt-chrome), copies the cookies and user agent into the client and replays the request. Chrome opens a visible window unless `headed(false)` is set.
+  - `Browser` (feature `browser`): detects a challenge page, solves it in a browser of [volt-browser](../volt-browser), copies the cookies and user agent into the client and replays the request. The builder takes the engine as one line, `|settings| Chrome::default().launch(settings)` for [volt-chrome](../volt-chrome) or `|settings| Webview.launch(settings)` for [volt-webview](../volt-webview), and each engine keeps its own requirements. The browser opens a visible window unless `headed(false)` is set.
 - **Retries**: a `RetryPolicy` with max attempts, initial and maximum waits, and a `Classifier` deciding what is worth retrying: transient errors, transport failures, rate limits, server errors. `retry_after` reads the header in both forms.
 - **Redirects**: a `RedirectPolicy` with a limit and a `Classifier` to follow, stop or stay on the same host.
 - **Errors**: one `Error` with the transport and middleware cases, and the HTTP status where there is one.
@@ -22,19 +22,17 @@ An HTTP client for scraping and API work, built on [wreq](https://crates.io/crat
 
 ```toml
 [dependencies]
-volt-http = { git = "https://github.com/efbx/volt", tag = "v0.5.1" }
+volt-http = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 ```
 
-Add `features = ["chrome"]` for the browser middleware. Requires Rust 1.95 or newer.
+Add `features = ["browser"]` for the browser middleware, and the crate of the engine it should solve in. Requires Rust 1.95 or newer.
 
 ## Example
 
-```rust
-use std::sync::Arc;
-
+```rust,no_run
 use volt_http::middleware::{Anonymous, Bearer, MiddlewareResult, Token, TokenSource};
-use volt_http::{Client, Emulation};
+use volt_http::{Client, Emulation, Result};
 
 struct Login;
 
@@ -45,19 +43,22 @@ impl TokenSource for Login {
     }
 }
 
-let base = Client::builder().emulation(Emulation::Chrome131).cookie_store(true).build()?;
-let api = base.derive().middleware(Bearer::new(Login)).build();
+fn main() -> Result<()> {
+    let base = Client::builder().emulation(Emulation::Chrome131).cookie_store(true).build()?;
+    let api = base.derive().middleware(Bearer::new(Login)).build();
 
-let private = api.get("https://example.com/api/me").text_sync()?;
-let public = api
-    .get("https://example.com/api/cards/1")
-    .extension(Anonymous)
-    .json_sync::<serde_json::Value>()?;
+    let private = api.get("https://example.com/api/me").text_sync()?;
+    let public = api
+        .get("https://example.com/api/cards/1")
+        .extension(Anonymous)
+        .json_sync::<serde_json::Value>()?;
+    Ok(())
+}
 ```
 
 ## Feature flags
 
-- `chrome`: the `Browser` middleware and its `BrowserBuilder`, which pull in `volt-chrome` and a Chrome binary at runtime.
+- `browser`: the `Browser` middleware and its `BrowserBuilder`, which pull in `volt-browser`. The engine that runs the browser, `volt-chrome` or `volt-webview`, is the caller's own dependency.
 
 ## License
 

@@ -1,0 +1,75 @@
+[package]
+name = "volt-webview"
+description = "Pages in the system webview, opened inside the calling program and driven from any thread or tokio task, with timeouts and cookie capture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["webview", "wry", "browser", "cookies", "automation"]
+categories = ["web-programming", "gui"]
+
+[dependencies]
+async-trait = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+volt-browser = { workspace = true }
+
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+wry = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+dispatch2 = { workspace = true }
+objc2 = { workspace = true }
+objc2-app-kit = { workspace = true, features = ["NSApplication", "NSResponder", "NSView", "NSViewController", "NSWindow", "NSWindowRestoration"] }
+objc2-core-foundation = { workspace = true, features = ["CFDate", "CFRunLoop", "CFString"] }
+objc2-foundation = { workspace = true, features = ["NSGeometry", "NSString", "NSURL"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { workspace = true, features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
+glib-unix = { workspace = true }
+gtk = { workspace = true }
+javascriptcore-rs = { workspace = true }
+soup3 = { workspace = true }
+webkit2gtk = { workspace = true }
+
+[dev-dependencies]
+futures = { workspace = true }
+tokio = { workspace = true, features = ["macros"] }
+volt-browser-checks = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dev-dependencies]
+tao = { workspace = true }
+
+[[test]]
+name = "window"
+harness = false
+
+[[test]]
+name = "main_thread"
+harness = false
+
+[lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+redundant_clone = "warn"
+needless_collect = "warn"
+or_fun_call = "warn"
+format_push_string = "warn"
+implicit_clone = "warn"
+inefficient_to_string = "warn"
+format_collect = "warn"
+assigning_clones = "warn"
+needless_pass_by_value = "warn"
+unnecessary_to_owned = "warn"
+redundant_allocation = "warn"

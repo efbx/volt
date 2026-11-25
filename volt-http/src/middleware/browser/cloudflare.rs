@@ -1,6 +1,8 @@
+use std::future::Future;
 use std::sync::Arc;
 use std::time::Duration;
 
+use volt_browser::{Session, Settings};
 use wreq::cookie::Jar;
 
 use super::BrowserBuilder;
@@ -13,17 +15,20 @@ const CHALLENGE_POLLS: usize = 60;
 const CHALLENGE_POLL_INTERVAL: Duration = Duration::from_millis(500);
 
 impl BrowserBuilder {
-    /// Returns a builder for Cloudflare challenges that adds cookies to `jar`. Its action checks
-    /// every 500 ms, for up to 30 s, whether the challenge has cleared, then lets the cookies be
-    /// read either way.
-    pub fn cloudflare(jar: Arc<Jar>) -> Self {
-        Self::new(jar).action(|page| async move {
+    /// Returns a builder for Cloudflare challenges that adds cookies to `jar` and solves in the
+    /// browser `launch` starts, as [`new`](Self::new) describes. Its action checks every 500 ms,
+    /// for up to 30 s, whether the challenge has cleared, then lets the cookies be read either
+    /// way.
+    pub fn cloudflare<L, Fut>(jar: Arc<Jar>, launch: L) -> Self
+    where
+        L: Fn(Settings) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = Result<Session, volt_browser::Error>> + Send + 'static,
+    {
+        Self::new(jar, launch).action(|page| async move {
             for _ in 0..CHALLENGE_POLLS {
                 let cleared = page
-                    .evaluate(CHALLENGE_CLEARED)
+                    .evaluate::<bool>(CHALLENGE_CLEARED)
                     .await
-                    .ok()
-                    .and_then(|value| value.into_value::<bool>().ok())
                     .unwrap_or(false);
                 if cleared {
                     break;
