@@ -417,27 +417,40 @@ impl Servers {
         (url, listener)
     }
 
-    /// Starts a server that answers its first request with `response`.
+    /// How long a connection may take to bring its request.
+    const PATIENCE: Duration = Duration::from_millis(500);
+
+    /// Starts a server that answers its first request with `response`. A webview may open a
+    /// connection ahead of need and send its request on another, so a connection that brings no
+    /// request is passed over.
     fn answering(response: &'static str) -> (String, JoinHandle<()>) {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let url = format!("http://{}/", listener.local_addr().unwrap());
         let server = thread::spawn(move || {
-            let (stream, _) = listener.accept().unwrap();
-            Self::answer(&stream, response);
+            let served = listener
+                .incoming()
+                .map_while(Result::ok)
+                .any(|stream| Self::answered(&stream, response));
+            assert!(served, "the webview sent a request");
         });
         (url, server)
     }
 
-    /// Reads one request's headers from `stream` and writes `response`.
-    fn answer(stream: &TcpStream, response: &str) {
+    /// Reads one request's headers from `stream` and writes `response`, or does nothing for a
+    /// connection that brings no request within [`Servers::PATIENCE`]; returns whether it wrote.
+    fn answered(stream: &TcpStream, response: &str) -> bool {
+        stream.set_read_timeout(Some(Self::PATIENCE)).unwrap();
         let headers = BufReader::new(stream)
             .lines()
             .map_while(Result::ok)
             .take_while(|line| !line.is_empty())
             .count();
-        assert!(headers > 0, "the webview sent a request");
+        if headers == 0 {
+            return false;
+        }
         let mut writer = stream;
         writer.write_all(response.as_bytes()).unwrap();
+        true
     }
 }
 
