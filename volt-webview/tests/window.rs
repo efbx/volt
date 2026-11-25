@@ -350,42 +350,20 @@ const STATE: &str = "({length: history.length, entries: window.navigation ? navi
 
 impl Cases {
     async fn diagnose_back() {
-        let site = Servers::pages();
         let mut report = String::new();
-        for visible in [true, false] {
+        for visible in [true, true, true, false] {
             let options = Settings {
                 visible,
                 ..Settings::default()
             };
             let session = Webview.launch(options).await.unwrap();
-            let mut failures = 0;
-            for round in 0..80 {
-                let page = session.new_page().await.unwrap();
-                page.goto(&format!("{site}/list")).await.unwrap();
-                page.find(By::link("Next page")).click().await.unwrap();
-                page.wait_for_url(Match::Exact(&format!("{site}/next")))
-                    .await
-                    .unwrap();
-                page.wait_for_load(Load::Complete).await.unwrap();
-                let first: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
-                let started = Instant::now();
-                let outcome = page.back().await;
-                let took = started.elapsed();
-                let title = page.title().await;
-                let after: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
-                if !matches!(&title, Ok(title) if title == "List") {
-                    failures += 1;
-                    tokio::time::sleep(Duration::from_millis(600)).await;
-                    let late: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
-                    let _ = writeln!(
-                        report,
-                        "DIAGNOSE visible={visible} round={round} back={outcome:?} took={took:?} title={title:?}\n  before={first}\n  after={after}\n  late={late}"
-                    );
-                }
-                page.close().await.unwrap();
-            }
-            let _ = writeln!(report, "DIAGNOSE visible={visible}: {failures} of 80 failed");
+            let failures = Checks::run(&session).await.unwrap();
             session.close().await;
+            let _ = writeln!(
+                report,
+                "DIAGNOSE visible={visible}: {} failures {failures:#?}",
+                failures.len()
+            );
         }
         panic!("{report}");
     }

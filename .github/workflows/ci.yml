@@ -14,9 +14,15 @@ jobs:
         include:
           - os: ubuntu-latest
             display: xvfb-run --auto-servernum
+            round: 1
           - os: macos-latest
+            round: 1
+          - os: macos-latest
+            round: 2
+          - os: macos-latest
+            round: 3
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@nightly

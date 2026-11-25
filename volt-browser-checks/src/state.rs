@@ -97,10 +97,37 @@ impl Checks {
         page.wait_for_url(Match::Exact(&site.url("/next"))).await?;
         page.wait_for_load(Load::Complete).await?;
         Flaw::same("a followed link", &page.title().await?, "Next")?;
+        let state = "({length: history.length, entries: window.navigation ? navigation.entries().length : null, index: window.navigation && navigation.currentEntry ? navigation.currentEntry.index : null, back: window.navigation ? navigation.canGoBack : null, forward: window.navigation ? navigation.canGoForward : null, origin: String(performance.timeOrigin), url: location.href, title: document.title, ready: document.readyState})";
+        let first: serde_json::Value = page.evaluate(state).await?;
+        let started = std::time::Instant::now();
         page.back().await?;
-        Flaw::same("back", &page.title().await?, "List")?;
+        let took = started.elapsed();
+        let title = page.title().await?;
+        if title != "List" {
+            let after: serde_json::Value = page.evaluate(state).await?;
+            tokio::time::sleep(std::time::Duration::from_millis(600)).await;
+            let late: serde_json::Value = page.evaluate(state).await?;
+            Flaw::expect(
+                "DIAGNOSE back",
+                &format!("title {title:?} took {took:?} before={first} after={after} late={late}"),
+                false,
+            )?;
+        }
+        let first: serde_json::Value = page.evaluate(state).await?;
+        let started = std::time::Instant::now();
         page.forward().await?;
-        Flaw::same("forward", &page.title().await?, "Next")?;
+        let took = started.elapsed();
+        let title = page.title().await?;
+        if title != "Next" {
+            let after: serde_json::Value = page.evaluate(state).await?;
+            tokio::time::sleep(std::time::Duration::from_millis(600)).await;
+            let late: serde_json::Value = page.evaluate(state).await?;
+            Flaw::expect(
+                "DIAGNOSE forward",
+                &format!("title {title:?} took {took:?} before={first} after={after} late={late}"),
+                false,
+            )?;
+        }
         let before: String = page.evaluate("String(performance.timeOrigin)").await?;
         page.reload().await?;
         let after: String = page.evaluate("String(performance.timeOrigin)").await?;

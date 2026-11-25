@@ -137,6 +137,13 @@ impl Checks {
             Self::storage(session, &site).await,
         );
         Self::note(&mut failures, "caches", Self::caches(session, &site).await);
+        for _ in 0..60 {
+            Self::note(
+                &mut failures,
+                "navigation again",
+                Self::navigation(session, &site).await,
+            );
+        }
         Ok(failures)
     }
 
