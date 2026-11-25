@@ -7,6 +7,7 @@
 //! whose names contain `NAME`.
 
 use std::env;
+use std::fmt::Write as _;
 use std::future::Future;
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
@@ -17,7 +18,7 @@ use std::time::{Duration, Instant};
 
 use serde_json::Value;
 use tokio::runtime::{Builder, Runtime};
-use volt_browser::{Error, Page, Session, Settings};
+use volt_browser::{By, Error, Load, Match, Page, Session, Settings};
 use volt_browser_checks::Checks;
 use volt_webview::Webview;
 
@@ -83,6 +84,7 @@ const CASES: &[(&str, Body)] = &[
     ("two_sessions_run_side_by_side", || {
         Box::pin(Cases::two_sessions_run_side_by_side())
     }),
+    ("diagnose_back", || Box::pin(Cases::diagnose_back())),
 ];
 
 /// The window tests every platform runs.
@@ -344,6 +346,51 @@ impl Cases {
     }
 }
 
+const STATE: &str = "({length: history.length, entries: window.navigation ? navigation.entries().length : null, index: window.navigation && navigation.currentEntry ? navigation.currentEntry.index : null, back: window.navigation ? navigation.canGoBack : null, forward: window.navigation ? navigation.canGoForward : null, shortcut: !!(window.navigation && navigation.canGoBack === false && history.length <= Math.max(navigation.entries().length, 1)), origin: String(performance.timeOrigin), url: location.href, title: document.title, ready: document.readyState})";
+
+impl Cases {
+    async fn diagnose_back() {
+        let site = Servers::pages();
+        let mut report = String::new();
+        for visible in [true, false] {
+            let options = Settings {
+                visible,
+                ..Settings::default()
+            };
+            let session = Webview.launch(options).await.unwrap();
+            let mut failures = 0;
+            for round in 0..80 {
+                let page = session.new_page().await.unwrap();
+                page.goto(&format!("{site}/list")).await.unwrap();
+                page.find(By::link("Next page")).click().await.unwrap();
+                page.wait_for_url(Match::Exact(&format!("{site}/next")))
+                    .await
+                    .unwrap();
+                page.wait_for_load(Load::Complete).await.unwrap();
+                let first: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
+                let started = Instant::now();
+                let outcome = page.back().await;
+                let took = started.elapsed();
+                let title = page.title().await;
+                let after: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
+                if !matches!(&title, Ok(title) if title == "List") {
+                    failures += 1;
+                    tokio::time::sleep(Duration::from_millis(600)).await;
+                    let late: Value = page.evaluate(STATE).await.unwrap_or(Value::Null);
+                    let _ = writeln!(
+                        report,
+                        "DIAGNOSE visible={visible} round={round} back={outcome:?} took={took:?} title={title:?}\n  before={first}\n  after={after}\n  late={late}"
+                    );
+                }
+                page.close().await.unwrap();
+            }
+            let _ = writeln!(report, "DIAGNOSE visible={visible}: {failures} of 80 failed");
+            session.close().await;
+        }
+        panic!("{report}");
+    }
+}
+
 /// Sessions with one page.
 struct Open;
 
@@ -408,6 +455,32 @@ impl Servers {
         Self::answering(
             "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Disposition: attachment; filename=volt.bin\r\nContent-Length: 4\r\nConnection: close\r\n\r\nvolt",
         )
+    }
+
+    fn pages() -> String {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        thread::spawn(move || {
+            for stream in listener.incoming().map_while(Result::ok) {
+                thread::spawn(move || {
+                    let mut lines = BufReader::new(&stream).lines().map_while(Result::ok);
+                    let Some(request) = lines.next() else { return };
+                    lines.take_while(|line| !line.is_empty()).for_each(drop);
+                    let body = if request.contains(" /next ") {
+                        "<!doctype html><title>Next</title><h1>Next page</h1>"
+                    } else {
+                        "<!doctype html><title>List</title><a href=\"/next\">Next page</a>"
+                    };
+                    let mut writer = &stream;
+                    let _ = write!(
+                        writer,
+                        "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                        body.len()
+                    );
+                });
+            }
+        });
+        url
     }
 
     /// Starts a server that accepts connections and never answers; it stops with the listener.
