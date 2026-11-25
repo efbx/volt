@@ -10,8 +10,9 @@ use crate::{Blocker, Error, Rect};
 
 /// The helper script every command runs in the page: a function that takes one command, finds
 /// its elements, carries it out and hands back one answer. It travels with each call, so a
-/// navigation cannot lose it, and leaves nothing in the page but a slot for each promise a
-/// command left, until that command takes the promise's value.
+/// navigation cannot lose it, and leaves two things in the page: a slot for each promise a
+/// command left, until that command takes the promise's value, and a mark on the document a
+/// reload or a step through the history is about to leave.
 ///
 /// It is kept as one file per topic and joined into one function when the crate is compiled.
 /// The topic files hold function declarations and constants only, so their order here is free;
@@ -59,7 +60,7 @@ pub(crate) enum Op {
     Source,
     /// The page's user agent.
     UserAgent,
-    /// The document's identity, to tell a later document from it.
+    /// Marks the document, to tell a later document from it.
     Mark,
     /// Whether the page has left the marked document and finished loading the next.
     Moved,
