@@ -1,9 +1,11 @@
 use std::io;
 use std::net::SocketAddr;
+use std::time::Duration;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::task::JoinHandle;
+use tokio::time;
 
 /// The page with the login form.
 const FORM: &str = include_str!("html/form.html");
@@ -37,6 +39,10 @@ pub(super) struct Site {
 impl Site {
     /// The host name of the site, which its cookies belong to.
     pub(super) const HOST: &str = "127.0.0.1";
+    /// The path of the page that takes [`Site::SLOWNESS`] to arrive.
+    pub(super) const SLOW: &str = "/slow";
+    /// How long the slow page takes to arrive.
+    const SLOWNESS: Duration = Duration::from_millis(300);
 
     /// Starts the site on a free port of this machine.
     pub(super) async fn serve() -> io::Result<Self> {
@@ -73,7 +79,11 @@ impl Site {
                 Ok(read) => request.extend_from_slice(&chunk[..read]),
             }
         }
-        let response = Self::response(Self::path(&request));
+        let path = Self::path(&request);
+        if path == Self::SLOW {
+            time::sleep(Self::SLOWNESS).await;
+        }
+        let response = Self::response(path);
         let _ = stream.write_all(response.as_bytes()).await;
         let _ = stream.shutdown().await;
     }
@@ -100,7 +110,7 @@ impl Site {
             "/late" => ("200 OK", "", LATE),
             "/frame" => ("200 OK", "", FRAME),
             "/inner" => ("200 OK", "", INNER),
-            "/next" => ("200 OK", "", NEXT),
+            "/next" | Self::SLOW => ("200 OK", "", NEXT),
             "/state" => ("200 OK", COOKIES, STATE),
             "/submitted" => ("200 OK", "", SUBMITTED),
             _ => ("404 Not Found", "", ""),
@@ -120,6 +130,8 @@ impl Drop for Site {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::TcpStream;
 
@@ -166,6 +178,15 @@ mod tests {
             state.contains("Set-Cookie: theme=dark; Path=/\r\n"),
             "{state}"
         );
+    }
+
+    #[tokio::test]
+    async fn the_slow_page_takes_its_time() {
+        let site = Site::serve().await.unwrap();
+        let asked = Instant::now();
+        let slow = Visitor::get(&site, Site::SLOW).await;
+        assert!(asked.elapsed() >= Site::SLOWNESS, "{:?}", asked.elapsed());
+        assert!(slow.contains("<title>Next</title>"), "{slow}");
     }
 
     #[tokio::test]

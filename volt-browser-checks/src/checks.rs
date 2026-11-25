@@ -123,6 +123,11 @@ impl Checks {
         );
         Self::note(
             &mut failures,
+            "a drifting clock",
+            Self::drifting(session, &site).await,
+        );
+        Self::note(
+            &mut failures,
             "closing",
             Self::closing(session, &site).await,
         );

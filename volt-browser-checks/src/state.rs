@@ -7,6 +7,11 @@ use volt_browser::{Area, By, Cookie, Error, Load, Match, Session};
 use super::checks::{Checks, Flaw, Outcome};
 use super::site::Site;
 
+/// The script that leaves a note in the document and makes its clock start read differently each
+/// time, as the clock start of one document does in newer `WebKit`.
+const DRIFT: &str = "void (window.stale = true, Object.defineProperty(performance, 'timeOrigin', { get: function () { return Math.random(); } }))";
+/// The script that tells whether the document still holds the note [`DRIFT`] left.
+const STALE: &str = "window.stale === true";
 /// The script that puts one answer into a cache called `pages`.
 const CACHE: &str = "caches.open('pages').then(function (cache) { return cache.put('/cached', new Response('hello', { headers: { 'content-type': 'text/plain' } })); })";
 
@@ -101,10 +106,10 @@ impl Checks {
         Flaw::same("back", &page.title().await?, "List")?;
         page.forward().await?;
         Flaw::same("forward", &page.title().await?, "Next")?;
-        let before: String = page.evaluate("String(performance.timeOrigin)").await?;
+        page.evaluate::<()>("void (window.stale = true)").await?;
         page.reload().await?;
-        let after: String = page.evaluate("String(performance.timeOrigin)").await?;
-        Flaw::expect("reload", &after, before != after)?;
+        let stale: bool = page.evaluate(STALE).await?;
+        Flaw::expect("reload", &stale, !stale)?;
         Flaw::same("reloaded page", &page.title().await?, "Next")?;
         page.goto(&site.url_elsewhere("/list")).await?;
         page.back().await?;
@@ -137,6 +142,17 @@ impl Checks {
             "about:blank",
         )?;
         Ok(first.close().await?)
+    }
+
+    /// A reload returns with the new document even where the old one's clock start reads
+    /// differently each time and the new one is slow to arrive.
+    pub(super) async fn drifting(session: &Session, site: &Site) -> Outcome {
+        let page = Self::open(session, site, Site::SLOW).await?;
+        page.evaluate::<()>(DRIFT).await?;
+        page.reload().await?;
+        let stale: bool = page.evaluate(STALE).await?;
+        Flaw::expect("a reload under a drifting clock", &stale, !stale)?;
+        Ok(page.close().await?)
     }
 
     /// A page closed through one clone fails at once through another.

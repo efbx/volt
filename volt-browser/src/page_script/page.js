@@ -1,3 +1,5 @@
+const MARK = "__volt_browser_mark";
+
 function leave(step) {
   return function () {
     const there = window.navigation;
@@ -48,11 +50,14 @@ const paged = {
     return ok(String(navigator.userAgent));
   },
   mark: function () {
-    return ok({ origin: String(performance.timeOrigin), url: location.href });
+    Object.defineProperty(window, MARK, { value: command.token, configurable: true });
+    return ok({ token: command.token, url: location.href });
   },
   moved: function (arg) {
-    const elsewhere = String(performance.timeOrigin) !== arg.origin || location.href !== arg.url;
-    return met(elsewhere && document.readyState === "complete");
+    const marked = window[MARK] === arg.token;
+    if ((marked && location.href === arg.url) || document.readyState !== "complete") return met(false);
+    if (marked) delete window[MARK];
+    return met(true);
   },
   loaded: function (arg) {
     return met(arg === "interactive" ? document.readyState !== "loading" : document.readyState === "complete");

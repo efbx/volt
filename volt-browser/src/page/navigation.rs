@@ -30,8 +30,8 @@ pub enum Match<'a> {
 /// What tells one document of a page from the next.
 #[derive(Debug, Serialize, Deserialize)]
 struct Mark {
-    /// When the document started, as its page words it.
-    origin: String,
+    /// The number the page keeps on the marked document, and on no other.
+    token: u64,
     /// The document's URL.
     url: String,
 }
@@ -159,7 +159,7 @@ mod tests {
 
     #[tokio::test]
     async fn a_reload_waits_until_the_marked_document_is_left() {
-        let mark = json!({"origin": "1731561234567.5", "url": "https://example.com/"});
+        let mark = json!({"token": 3, "url": "https://example.com/"});
         let fake = Fake::answering([
             json!({"status": "ok", "json": mark.to_string()}),
             json!({"status": "ok", "json": "true"}),
@@ -177,7 +177,7 @@ mod tests {
     #[tokio::test]
     async fn going_back_with_nowhere_to_go_does_not_wait() {
         let fake = Fake::answering([
-            json!({"status": "ok", "json": "{\"origin\":\"1\",\"url\":\"about:blank\"}"}),
+            json!({"status": "ok", "json": "{\"token\":1,\"url\":\"about:blank\"}"}),
             json!({"status": "ok", "json": "false"}),
         ]);
         fake.page().back().await.unwrap();
@@ -187,7 +187,7 @@ mod tests {
     #[tokio::test]
     async fn a_leaving_call_that_was_cut_off_still_waits_for_the_next_document() {
         let fake = Fake::answering([
-            json!({"status": "ok", "json": "{\"origin\":\"1\",\"url\":\"https://example.com/b\"}"}),
+            json!({"status": "ok", "json": "{\"token\":1,\"url\":\"https://example.com/b\"}"}),
             Value::Null,
             json!({"status": "ok", "json": null}),
         ]);
