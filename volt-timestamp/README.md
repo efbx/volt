@@ -19,7 +19,7 @@ APIs disagree on units and on types: one sends nanoseconds as a number, the next
 
 ```toml
 [dependencies]
-volt-timestamp = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
+volt-timestamp = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
 ```
 
 Requires Rust 1.95 or newer.

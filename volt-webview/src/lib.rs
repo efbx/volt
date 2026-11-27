@@ -8,21 +8,51 @@
 //! `HttpOnly` ones included. Every failure is a [`volt_browser::Error`]; what only a webview can
 //! fail with, as a display that is missing or a page whose process ended, is its
 //! [`Engine`](volt_browser::Error::Engine) kind.
+//!
+//! The `webkitgtk` feature, on by default, holds the part for Linux and the BSDs with its GTK
+//! dependencies. A program whose other dependencies bring an older version of those turns it
+//! off: macOS and Windows keep the webview, and a launch on Linux and the BSDs fails with the
+//! `Engine` kind.
 
 #![cfg_attr(doctest, doc = include_str!("../README.md"))]
+#![cfg_attr(
+    not(any(
+        test,
+        target_os = "macos",
+        target_os = "windows",
+        all(
+            feature = "webkitgtk",
+            any(
+                target_os = "linux",
+                target_os = "dragonfly",
+                target_os = "freebsd",
+                target_os = "netbsd",
+                target_os = "openbsd"
+            )
+        )
+    )),
+    expect(dead_code)
+)]
 #![warn(missing_docs)]
 
 #[cfg(any(
     target_os = "macos",
     target_os = "windows",
-    target_os = "linux",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "netbsd",
-    target_os = "openbsd"
+    all(
+        feature = "webkitgtk",
+        any(
+            target_os = "linux",
+            target_os = "dragonfly",
+            target_os = "freebsd",
+            target_os = "netbsd",
+            target_os = "openbsd"
+        )
+    )
 ))]
 mod cookie;
 mod error;
+#[cfg(any(test, target_os = "windows"))]
+mod error_page;
 mod link;
 mod pages;
 mod platform;

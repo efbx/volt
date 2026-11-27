@@ -19,8 +19,8 @@ There is no helper process and nothing to call in `main`. Windows and webviews m
 
 ```toml
 [dependencies]
-volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
-volt-webview = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
+volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
+volt-webview = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
 ```
 
@@ -64,6 +64,10 @@ async fn sign_in(user: &str, password: &str) -> Result<Vec<String>, Error> {
         .await
 }
 ```
+
+## Feature flags
+
+- `webkitgtk` (default): the part for Linux and the BSDs, with its GTK dependencies. Cargo allows a program one version of the GTK bindings and checks that on every system, so a program whose other dependencies bring an older one sets `default-features = false`. macOS and Windows keep the webview; on Linux and the BSDs `Webview::launch` then fails with the `Engine` kind.
 
 ## Tests
 

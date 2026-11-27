@@ -29,11 +29,12 @@ const CLOSE_GRACE: Duration = Duration::from_secs(3);
 /// Every failure is a [`volt_browser::Error`]; what only a webview can fail with is its
 /// [`Engine`](volt_browser::Error::Engine) kind, with the reason as its message. A failed load
 /// ends as the platform reports it: `WKWebView` reports no end, so on macOS the `goto` fails with
-/// [`volt_browser::Error::Timeout`]; `WebView2` loads its error page, so on Windows it succeeds;
-/// `WebKitGTK` reports the failure, so on Linux and the BSDs the `goto` fails with the `Engine`
-/// kind. A later `goto` on the same page replaces one still waiting, which then fails with the
-/// `Engine` kind too, and so does, on macOS, Linux and the BSDs, a `goto` whose page loses its web
-/// content process.
+/// [`volt_browser::Error::Timeout`]; `WebKitGTK` reports the failure, so on Linux and the BSDs
+/// the `goto` fails with the `Engine` kind; `WebView2` shows its own error page instead, which
+/// the `goto` finds, so on Windows it fails with the `Engine` kind too, naming the page's error
+/// code. A later `goto` on the same page replaces one still waiting, which then fails with the
+/// `Engine` kind as well, and so does, on macOS, Linux and the BSDs, a `goto` whose page loses
+/// its web content process.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Webview;
 
@@ -47,14 +48,14 @@ impl Webview {
     /// # Errors
     ///
     /// A failure of the webview itself comes back as [`volt_browser::Error::Engine`], with the
-    /// reason as its message: on a target without a system webview; when that thread cannot be
-    /// reached, which on macOS is when the main thread runs no event loop and the call is not
-    /// awaited on the main thread, as in a terminal program's tasks or a test under the default
-    /// harness, and on Linux and the BSDs is without a display; and on macOS when the call blocks
-    /// the main thread from inside its event loop. Outside a Tokio runtime it fails with
-    /// [`volt_browser::Error::NoRuntime`], and with [`volt_browser::Error::Timeout`] when that
-    /// thread does not answer in time. On Windows a missing `WebView2` Runtime shows only when
-    /// opening a page fails.
+    /// reason as its message: on a target without a system webview, which Linux and the BSDs are
+    /// without the `webkitgtk` feature; when that thread cannot be reached, which on macOS is when
+    /// the main thread runs no event loop and the call is not awaited on the main thread, as in a
+    /// terminal program's tasks or a test under the default harness, and on Linux and the BSDs is
+    /// without a display; and on macOS when the call blocks the main thread from inside its event
+    /// loop. Outside a Tokio runtime it fails with [`volt_browser::Error::NoRuntime`], and with
+    /// [`volt_browser::Error::Timeout`] when that thread does not answer in time. On Windows a
+    /// missing `WebView2` Runtime shows only when opening a page fails.
     pub async fn launch(self, settings: Settings) -> Result<Session, volt_browser::Error> {
         let launched = Launched::start(&settings).await?;
         Session::new(launched, settings)

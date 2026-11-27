@@ -17,19 +17,20 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.0"
+version = "0.6.1"
 edition = "2024"
 rust-version = "1.95"
 license = "MIT"
 repository = "https://github.com/efbx/volt"
 
 [workspace.dependencies]
-volt-browser = { path = "volt-browser", version = "0.6.0" }
-volt-browser-checks = { path = "volt-browser-checks", version = "0.6.0" }
-volt-chrome = { path = "volt-chrome", version = "0.6.0" }
-volt-coerce = { path = "volt-coerce", version = "0.6.0" }
-volt-coerce-macros = { path = "volt-coerce-macros", version = "0.6.0" }
-volt-stringx = { path = "volt-stringx", version = "0.6.0" }
+volt-browser = { path = "volt-browser", version = "0.6.1" }
+volt-browser-checks = { path = "volt-browser-checks", version = "0.6.1" }
+volt-chrome = { path = "volt-chrome", version = "0.6.1" }
+volt-coerce = { path = "volt-coerce", version = "0.6.1" }
+volt-coerce-macros = { path = "volt-coerce-macros", version = "0.6.1" }
+volt-http = { path = "volt-http", version = "0.6.1" }
+volt-stringx = { path = "volt-stringx", version = "0.6.1" }
 aho-corasick = "1.1.5"
 async-trait = "0.1.92"
 base64 = "0.23.1"
@@ -66,7 +67,7 @@ webkit2gtk = { version = "3.0.0", features = ["v2_40"] }
 windows = "0.62.2"
 wreq = { version = "6.0.0-rc.31", features = ["json", "cookies", "gzip", "brotli", "zstd", "deflate", "charset", "form", "query", "multipart", "stream"] }
 wreq-util = "3.0.0-rc.14"
-wry = { version = "0.57.3", default-features = false }
+wry = { version = "0.58.2", default-features = false }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

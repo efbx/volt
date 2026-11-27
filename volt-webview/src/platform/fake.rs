@@ -11,6 +11,7 @@ use url::Url;
 use volt_browser::Cookie;
 
 use crate::Error;
+use crate::error_page::ErrorPage;
 use crate::pages::{LoadEvent, Setup};
 use crate::script::Script;
 
@@ -29,6 +30,11 @@ impl Fake {
     pub(crate) const BLANKED_URL: &str = "https://fake.invalid/blanked";
     /// The blank page in capitals, which the webview opens as it does `about:blank`.
     pub(crate) const BLANK_URL: &str = "ABOUT:blank";
+    /// A URL whose load finishes on the webview's own error page, as a failed load does in
+    /// `WebView2`.
+    pub(crate) const ERROR_PAGE_URL: &str = "https://fake.invalid/error-page";
+    /// The error code the fake webview's error page names.
+    pub(crate) const ERROR_CODE: &str = "ERR_FAKE";
     /// A URL whose load ends the web content process.
     pub(crate) const CRASHING_URL: &str = "https://fake.invalid/crashing";
     /// A URL whose load events arrive only with the next call on the page.
@@ -147,6 +153,8 @@ pub(crate) struct Surface {
     held: RefCell<Vec<Held>>,
     /// The load events it reports with the next call.
     pending: RefCell<Vec<LoadEvent>>,
+    /// Whether the page it shows is its own error page.
+    error_page: Cell<bool>,
 }
 
 impl Surface {
@@ -170,15 +178,17 @@ impl Surface {
             visible: Cell::new(setup.visible),
             held: RefCell::new(Vec::new()),
             pending: RefCell::new(Vec::new()),
+            error_page: Cell::new(false),
         };
         surface.complete_load();
         Ok(surface)
     }
 
     /// Starts loading `url`, which loads at once unless it is one of [`Fake`]'s URLs; a refused
-    /// URL goes to `refused`.
+    /// URL goes to `refused`, and [`Fake::ERROR_PAGE_URL`] loads the error page.
     pub(crate) fn load(&self, url: &str, refused: impl FnOnce(Error)) {
         self.report_pending();
+        self.error_page.set(url == Fake::ERROR_PAGE_URL);
         match url {
             Fake::STUCK_URL => {}
             Fake::REFUSED_URL => {
@@ -232,8 +242,19 @@ impl Surface {
                 thread::sleep(Fake::BUSY);
                 done(Ok(Self::json_text("1")));
             }
+            ErrorPage::PROBE => done(Ok(self.probed())),
             "undefined" => done(Ok("null".to_owned())),
             _ => done(Ok(Self::json_text(expression))),
+        }
+    }
+
+    /// Returns what the error page probe gives: `null` on any page but the error page, and there
+    /// the page's error code as JSON text, handed back as JSON text itself.
+    fn probed(&self) -> String {
+        if self.error_page.get() {
+            Self::json_text(&Self::json_text(Fake::ERROR_CODE))
+        } else {
+            "null".to_owned()
         }
     }
 

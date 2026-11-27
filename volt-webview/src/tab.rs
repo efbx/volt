@@ -5,6 +5,10 @@ use serde_json::Value;
 use url::Url;
 use volt_browser::{Cookie, Engine};
 
+#[cfg(any(test, target_os = "windows"))]
+use crate::Error;
+#[cfg(any(test, target_os = "windows"))]
+use crate::error_page::ErrorPage;
 use crate::link::Link;
 use crate::script::Script;
 
@@ -25,17 +29,34 @@ impl Tab {
     pub(crate) fn new(link: Arc<Link>, id: u64) -> Self {
         Self { link, id }
     }
+
+    /// Fails with the load's failure when the page a load just ended on is the error page
+    /// `WebView2` shows in place of one it could not load.
+    #[cfg(any(test, target_os = "windows"))]
+    async fn landed(&self) -> Result<(), Error> {
+        let id = self.id;
+        let shown = self
+            .link
+            .call(move |pages, reply| pages.evaluate(id, ErrorPage::PROBE, reply))
+            .await?;
+        ErrorPage::check(shown)
+    }
 }
 
 #[async_trait]
 impl Engine for Tab {
+    /// Loads `url` and waits for the end of that load. `WebView2` ends a load it could not make
+    /// as a finished one, on its own error page, so on Windows the page is then asked whether it
+    /// is that page.
     async fn goto(&self, url: &Url) -> Result<(), volt_browser::Error> {
         let id = self.id;
         let url = url.as_str().to_owned();
-        Ok(self
-            .link
+        self.link
             .call(move |pages, reply| pages.goto(id, &url, reply))
-            .await?)
+            .await?;
+        #[cfg(any(test, target_os = "windows"))]
+        self.landed().await?;
+        Ok(())
     }
 
     /// Evaluates the expression `script` and returns its value as JSON, as the page's own
@@ -221,6 +242,18 @@ mod tests {
         assert!(Opened::failed_with(&refused, |error| matches!(
             error,
             Error::Webview(_)
+        )));
+        page.goto(&Opened::site()).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn a_goto_that_ends_on_the_webviews_error_page_fails_with_its_error_code() {
+        let (_launched, page) = Opened::page().await;
+
+        let failed = page.goto(&Opened::url(Fake::ERROR_PAGE_URL)).await;
+        assert!(Opened::failed_with(&failed, |error| matches!(
+            error,
+            Error::LoadFailed(code) if code.to_string() == Fake::ERROR_CODE
         )));
         page.goto(&Opened::site()).await.unwrap();
     }

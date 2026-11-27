@@ -10,6 +10,10 @@ readme = "README.md"
 keywords = ["webview", "wry", "browser", "cookies", "automation"]
 categories = ["web-programming", "gui"]
 
+[features]
+default = ["webkitgtk"]
+webkitgtk = ["dep:glib-unix", "dep:gtk", "dep:javascriptcore-rs", "dep:soup3", "dep:webkit2gtk"]
+
 [dependencies]
 async-trait = { workspace = true }
 serde_json = { workspace = true }
@@ -32,19 +36,25 @@ objc2-foundation = { workspace = true, features = ["NSGeometry", "NSString", "NS
 windows = { workspace = true, features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
-glib-unix = { workspace = true }
-gtk = { workspace = true }
-javascriptcore-rs = { workspace = true }
-soup3 = { workspace = true }
-webkit2gtk = { workspace = true }
+glib-unix = { workspace = true, optional = true }
+gtk = { workspace = true, optional = true }
+javascriptcore-rs = { workspace = true, optional = true }
+soup3 = { workspace = true, optional = true }
+webkit2gtk = { workspace = true, optional = true }
 
 [dev-dependencies]
 futures = { workspace = true }
 tokio = { workspace = true, features = ["macros"] }
 volt-browser-checks = { workspace = true }
+volt-http = { workspace = true, features = ["browser"] }
+wreq = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
 tao = { workspace = true }
+
+[[test]]
+name = "webkitgtk"
+required-features = ["webkitgtk"]
 
 [[test]]
 name = "window"

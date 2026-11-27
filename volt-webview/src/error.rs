@@ -12,8 +12,9 @@ pub(crate) enum Error {
     /// The system webview cannot run in this process, for the reason given: on macOS no event
     /// loop serves the main thread and the call is not awaited there, or the call blocks the main
     /// thread from inside its event loop; on Linux and the BSDs there is no display, GTK refused
-    /// to start, or GTK belongs to a thread that does not serve the crate; on Windows the
-    /// session's window thread could not start; every other target has no system webview.
+    /// to start, GTK belongs to a thread that does not serve the crate, or the crate was built
+    /// without its `webkitgtk` feature; on Windows the session's window thread could not start;
+    /// every other target has no system webview.
     #[error("the system webview cannot run here: {0}")]
     Unavailable(Cow<'static, str>),
     /// [`Webview::launch`](crate::Webview::launch) was awaited outside a Tokio runtime, whose
@@ -29,9 +30,10 @@ pub(crate) enum Error {
     #[cfg(any(test, target_os = "macos", target_os = "windows"))]
     #[error("the webview cannot load this URL")]
     InvalidUrl,
-    /// The load failed. `WebKitGTK` reports failed loads, so most of these happen on Linux and
-    /// the BSDs; a webview that opens `about:blank` in place of an address it refuses fails the
-    /// load on any platform.
+    /// The load failed. `WebKitGTK` reports failed loads, and `WebView2` shows its error page
+    /// for one, whose error code is then the reason, so most of these happen on Linux, the BSDs
+    /// and Windows; a webview that opens `about:blank` in place of an address it refuses fails
+    /// the load on any platform.
     #[error("the load failed: {0}")]
     LoadFailed(#[source] Cause),
     /// The page's web content process ended, by a crash or for lack of memory, while a load was

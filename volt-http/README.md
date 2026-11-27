@@ -22,7 +22,7 @@ An HTTP client for scraping and API work, built on [wreq](https://crates.io/crat
 
 ```toml
 [dependencies]
-volt-http = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
+volt-http = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 ```
 

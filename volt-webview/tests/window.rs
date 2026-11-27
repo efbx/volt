@@ -12,6 +12,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::pin::Pin;
 use std::process::{self, ExitCode};
+use std::sync::Arc;
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
@@ -19,7 +20,10 @@ use serde_json::Value;
 use tokio::runtime::{Builder, Runtime};
 use volt_browser::{Error, Page, Session, Settings};
 use volt_browser_checks::Checks;
+use volt_http::middleware::BrowserBuilder;
+use volt_http::{Client, StatusCode};
 use volt_webview::Webview;
+use wreq::cookie::Jar;
 
 /// A page titled `volt`, as a data URL.
 const TITLED_PAGE: &str = "data:text/html,%3Ctitle%3Evolt%3C%2Ftitle%3E";
@@ -83,6 +87,10 @@ const CASES: &[(&str, Body)] = &[
     ("two_sessions_run_side_by_side", || {
         Box::pin(Cases::two_sessions_run_side_by_side())
     }),
+    (
+        "a_refused_request_is_solved_in_the_webview_and_sent_again",
+        || Box::pin(Cases::a_refused_request_is_solved_in_the_webview_and_sent_again()),
+    ),
 ];
 
 /// The window tests every platform runs.
@@ -342,6 +350,32 @@ impl Cases {
         assert_eq!(first.unwrap(), "volt");
         assert_eq!(second.unwrap(), "volt");
     }
+
+    /// Sends a request the gated site refuses until volt-http has opened the site in a hidden
+    /// page of the webview, and reads the request it then sent again.
+    async fn a_refused_request_is_solved_in_the_webview_and_sent_again() {
+        let (url, site) = Gated::start();
+        let jar = Arc::new(Jar::default());
+        let browser = BrowserBuilder::new(jar.clone(), |settings| Webview.launch(settings))
+            .recovery_url(format!("{url}solve"))
+            .headed(false)
+            .solve_timeout(Duration::from_secs(60))
+            .build();
+        let client = Client::builder()
+            .cookie_jar(jar)
+            .middleware(browser)
+            .build()
+            .unwrap();
+
+        let response = client.get(format!("{url}data")).send().await.unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let sent_again = site.join().unwrap();
+        assert!(
+            sent_again.contains("user-agent: mozilla/5.0"),
+            "{sent_again}"
+        );
+    }
 }
 
 /// Sessions with one page.
@@ -370,24 +404,24 @@ struct Platform;
 
 impl Platform {
     /// Whether `failed` is how this platform ends a load from a port its webview does not use:
-    /// `WKWebView` reports no end, `WebView2` loads its error page, `WebKitGTK` reports the
-    /// failure. Newer `WebKit`, seen with Safari 27.2 and `WebKitGTK` 2.52.6, opens a blank page
-    /// instead, which fails the load on both.
+    /// `WKWebView` reports no end, `WebKitGTK` reports the failure, and `WebView2` shows its
+    /// error page, whose error code the load then fails for. Newer `WebKit`, seen with Safari
+    /// 27.2 and `WebKitGTK` 2.52.6, opens a blank page instead, which fails the load on both.
     fn reports_a_failed_load_as(failed: &Result<(), Error>) -> bool {
         if cfg!(target_os = "macos") {
-            matches!(failed, Err(Error::Timeout(_))) || Self::says_the_load_failed(failed)
+            matches!(failed, Err(Error::Timeout(_))) || Self::says(failed, "the load failed")
         } else if cfg!(target_os = "windows") {
-            failed.is_ok()
+            Self::says(failed, "the load failed: ERR_")
         } else {
-            Self::says_the_load_failed(failed)
+            Self::says(failed, "the load failed")
         }
     }
 
-    /// Whether `failed` is the engine's own failure of a load.
-    fn says_the_load_failed(failed: &Result<(), Error>) -> bool {
+    /// Whether `failed` is the engine's own failure, with a message that starts with `message`.
+    fn says(failed: &Result<(), Error>, message: &str) -> bool {
         matches!(
             failed,
-            Err(Error::Engine(cause)) if cause.to_string().starts_with("the load failed")
+            Err(Error::Engine(cause)) if cause.to_string().starts_with(message)
         )
     }
 }
@@ -451,6 +485,77 @@ impl Servers {
         let mut writer = stream;
         writer.write_all(response.as_bytes()).unwrap();
         true
+    }
+}
+
+/// A site on 127.0.0.1 that refuses every request without its cookie, and gives the cookie,
+/// hidden from scripts, to whoever opens `/solve`.
+struct Gated;
+
+impl Gated {
+    /// The answer to whoever opens `/solve`: a page, with the cookie.
+    const SOLVED: &str = "HTTP/1.1 200 OK\r\nSet-Cookie: pass=1; HttpOnly; Path=/\r\nContent-Type: text/html\r\nContent-Length: 21\r\nConnection: close\r\n\r\n<title>Solved</title>";
+    /// The answer to a request that carries the cookie.
+    const THROUGH: &str =
+        "HTTP/1.1 200 OK\r\nContent-Length: 7\r\nConnection: close\r\n\r\nthrough";
+    /// The answer to every other request.
+    const REFUSED: &str =
+        "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+
+    /// Starts the site on a free port. It ends once it has let a request for `/data` through,
+    /// and its thread returns that request's headers, in lower case.
+    fn start() -> (String, JoinHandle<String>) {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}/", listener.local_addr().unwrap());
+        let site = thread::spawn(move || {
+            listener
+                .incoming()
+                .map_while(Result::ok)
+                .find_map(|stream| Self::let_through(&stream))
+                .expect("a request for /data came with the cookie")
+        });
+        (url, site)
+    }
+
+    /// Answers the request `stream` brings, and returns its headers when it was a request for
+    /// `/data` that the site let through.
+    fn let_through(stream: &TcpStream) -> Option<String> {
+        let head = Self::head(stream);
+        let passed = head.starts_with("get /data") && head.contains("pass=1");
+        if !head.is_empty() {
+            let mut writer = stream;
+            let _ = writer.write_all(Self::answer(&head, passed).as_bytes());
+        }
+        passed.then_some(head)
+    }
+
+    /// Returns the site's answer to the request with the headers `head`, which carried the
+    /// cookie on its way to `/data` when `passed` says so.
+    fn answer(head: &str, passed: bool) -> &'static str {
+        if head.starts_with("get /solve") {
+            Self::SOLVED
+        } else if passed {
+            Self::THROUGH
+        } else {
+            Self::REFUSED
+        }
+    }
+
+    /// Reads one request's headers from `stream`, in lower case; a connection that brings no
+    /// request within [`Servers::PATIENCE`] gives none.
+    fn head(stream: &TcpStream) -> String {
+        stream.set_read_timeout(Some(Servers::PATIENCE)).unwrap();
+        let mut head = BufReader::new(stream)
+            .lines()
+            .map_while(Result::ok)
+            .take_while(|line| !line.is_empty())
+            .fold(String::new(), |mut head, line| {
+                head.push_str(&line);
+                head.push('\n');
+                head
+            });
+        head.make_ascii_lowercase();
+        head
     }
 }
 

@@ -10,9 +10,18 @@ use volt_browser::Cookie;
 use crate::Error;
 use crate::pages::{LoadEvent, Setup};
 
-/// Why no session can start: only macOS, Windows, Linux and the BSDs have a system webview the
-/// crate drives.
-const NO_WEBVIEW: &str = "this target has no system webview";
+/// Why no session can start: on Linux and the BSDs the crate was built without its `webkitgtk`
+/// feature, and no other target but macOS and Windows has a system webview the crate drives.
+const NO_WEBVIEW: &str = cfg_select! {
+    any(
+        target_os = "linux",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    ) => "volt-webview was built without its `webkitgtk` feature",
+    _ => "this target has no system webview",
+};
 
 /// The thread that would run webviews on a target without any, which never starts.
 pub(crate) struct UiThread<T> {

@@ -20,8 +20,8 @@ The commands are the same ones [volt-webview](../volt-webview) takes, so code wr
 
 ```toml
 [dependencies]
-volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
-volt-chrome = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
+volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
+volt-chrome = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
 ```
 

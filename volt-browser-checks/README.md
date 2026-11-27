@@ -11,7 +11,7 @@ The pages the checks open come from a small site the crate serves on this machin
 
 ```toml
 [dev-dependencies]
-volt-browser-checks = { git = "https://github.com/efbx/volt", tag = "v0.6.0" }
+volt-browser-checks = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
 ```
 
 Requires Rust 1.95 or newer. `Checks::run` must be awaited inside a Tokio runtime.

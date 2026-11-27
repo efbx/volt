@@ -492,9 +492,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.11.3"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02f0e023adb368345ce0ca6cdfc0f24a06554468d0e8503e14a0841de79bfa69"
+checksum = "95e45cf2980b2d467be49a9ed942c9179b701063a7ca3d037de7ee9bd67f8d66"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -990,9 +990,9 @@ dependencies = [
 
 [[package]]
 name = "dom_query"
-version = "0.29.0"
+version = "0.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "498c698ac51127148a3984450e51fca7f01805a91d7a1f7a24af0a5f761e3385"
+checksum = "b35b4f772a1a8b88e5545a67c2d3a62a93d4edccc5a68f2145fe52e39c96d275"
 dependencies = [
  "bit-set",
  "cssparser",
@@ -1131,9 +1131,9 @@ dependencies = [
 
 [[package]]
 name = "find-msvc-tools"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
+checksum = "3e44f110d1777dc6559a51e7d45083945ded4f1bf3305494350f693b6d20b9c8"
 
 [[package]]
 name = "flate2"
@@ -2993,7 +2993,7 @@ dependencies = [
  "num",
  "once_cell",
  "serde",
- "sha2 0.11.1",
+ "sha2",
  "zbus",
 ]
 
@@ -3075,9 +3075,9 @@ dependencies = [
 
 [[package]]
 name = "serde_html_form"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f0346d7a342ab90f405cfc08f25d15075f944f42fcabbc5eac923829fa6d228"
+checksum = "5cb47bbdfe5aaf62921705c1be39c4bde7da0ac74cb3d64f3038869c7097ae2f"
 dependencies = [
  "form_urlencoded",
  "indexmap",
@@ -3141,20 +3141,9 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.10.9"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
-dependencies = [
- "cfg-if",
- "cpufeatures 0.2.17",
- "digest 0.10.7",
-]
-
-[[package]]
-name = "sha2"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47d7069beb7d6ac7b9acd1039986e73443f24234f41074da099d6f994ac9ad19"
+checksum = "5b0e5c7d67bc53f435386b2130fdc900488c5703770f6d8a4633060e34288a27"
 dependencies = [
  "cfg-if",
  "cpufeatures 0.3.1",
@@ -3560,9 +3549,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "1.2.2+spec-1.1.0"
+version = "1.2.3+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5426cb1b964690d913f6c5c1a1ae0b42f428ec506bb4d452876d7a209c9bca3b"
+checksum = "26b1f26e9485c1fa43ee89fe76e9f3fb9e2e52bb227f8594b4d687496b83d073"
 dependencies = [
  "indexmap",
  "serde_core",
@@ -3584,9 +3573,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.25.20+spec-1.1.0"
+version = "0.25.21+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e76360e201d6dbd6583e17795ba71a88f47365a9139c8450a7979c32303b8e73"
+checksum = "88497dab46de5bf343ec66b05c251e48c6213f3e9170c70a70a823f7abe886a4"
 dependencies = [
  "indexmap",
  "toml_datetime",
@@ -3596,9 +3585,9 @@ dependencies = [
 
 [[package]]
 name = "toml_parser"
-version = "1.1.6+spec-1.1.0"
+version = "1.1.7+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6769c452d71ba30696c6b37770c439a9cc9110f47f7d5cdbeda79840ef5ea31"
+checksum = "0bb28d6e049a9766c3bd91a8326e6179f5b132dec87906bb97018ef7a2f3431a"
 dependencies = [
  "winnow",
 ]
@@ -3826,7 +3815,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "volt-browser"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -3844,7 +3833,7 @@ dependencies = [
 
 [[package]]
 name = "volt-browser-checks"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "http",
  "serde_json",
@@ -3854,7 +3843,7 @@ dependencies = [
 
 [[package]]
 name = "volt-chrome"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "chromiumoxide",
@@ -3869,7 +3858,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -3878,7 +3867,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce-macros"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3887,7 +3876,7 @@ dependencies = [
 
 [[package]]
 name = "volt-creds"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "keyring",
@@ -3901,14 +3890,14 @@ dependencies = [
 
 [[package]]
 name = "volt-filex"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "volt-stringx",
 ]
 
 [[package]]
 name = "volt-http"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -3930,25 +3919,25 @@ dependencies = [
 
 [[package]]
 name = "volt-slicex"
-version = "0.6.0"
+version = "0.6.1"
 
 [[package]]
 name = "volt-stringx"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-templater"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-timestamp"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "chrono",
  "serde",
@@ -3958,7 +3947,7 @@ dependencies = [
 
 [[package]]
 name = "volt-webview"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "dispatch2",
@@ -3978,8 +3967,10 @@ dependencies = [
  "url",
  "volt-browser",
  "volt-browser-checks",
+ "volt-http",
  "webkit2gtk",
  "windows",
+ "wreq",
  "wry",
 ]
 
@@ -4546,9 +4537,9 @@ checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
 name = "wry"
-version = "0.57.3"
+version = "0.58.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ceb43f824178e8110e3181bfd478359c43b041452a9560d321bd8d121e468f86"
+checksum = "a9fadb3ce0a4ec6f7acddf364af8bbf14f5a1e532e5d5eed3b8141cdd3b3a774"
 dependencies = [
  "base64 0.23.1",
  "block2",
@@ -4570,7 +4561,7 @@ dependencies = [
  "objc2-web-kit",
  "percent-encoding",
  "raw-window-handle",
- "sha2 0.10.9",
+ "sha2",
  "tao-macros",
  "thiserror 2.0.21",
  "url",
@@ -4707,18 +4698,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.65"
+version = "0.8.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32bc8a75f879cd6fe53a6bedf3c28f0e1b914c77424fc2be9e2ec85d7d25aff5"
+checksum = "cba8a86aee14fc8cc6c208af60854b3d4ab7185a9a369a12c648faa2716ff42a"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.65"
+version = "0.8.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8bfd2644ea1681f60cf95029ff18aa8ad1cc3f7b8fe37286f8e473bb29f816b"
+checksum = "f89bca3b96ceb3cfcb4572790402f977442270d252b9a8504ebc258760c55f94"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -68,12 +68,37 @@ async fn a_session_without_an_event_loop_on_the_main_thread_is_unavailable_after
     );
 }
 
-#[cfg(any(
-    target_os = "linux",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "netbsd",
-    target_os = "openbsd"
+#[cfg(all(
+    not(feature = "webkitgtk"),
+    any(
+        target_os = "linux",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    )
+))]
+#[tokio::test]
+async fn a_session_built_without_the_webkitgtk_feature_is_unavailable_and_says_so() {
+    let launched = Webview.launch(Settings::default()).await;
+
+    assert!(Launch::was_unavailable(&launched), "{launched:?}");
+    let reason = launched.unwrap_err().to_string();
+    assert!(
+        reason.ends_with("built without its `webkitgtk` feature"),
+        "{reason}"
+    );
+}
+
+#[cfg(all(
+    feature = "webkitgtk",
+    any(
+        target_os = "linux",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    )
 ))]
 mod without_a_display {
     use std::env;

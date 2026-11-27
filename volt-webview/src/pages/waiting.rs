@@ -14,7 +14,8 @@ pub(crate) enum LoadEvent {
     /// it refuses to load.
     Blank,
     /// A load has ended: with no reason when it finished, with the webview's reason when it
-    /// failed, which only `WebKitGTK` reports. `WebView2` ends a failed load with its error page.
+    /// failed, which only `WebKitGTK` reports. `WebView2` ends a failed load as a finished one,
+    /// on its error page, which the goto then looks for.
     Ended(Option<Cause>),
     /// The page's web content process ended; reported on macOS, Linux and the BSDs.
     Crashed,

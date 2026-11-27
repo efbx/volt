@@ -15,12 +15,15 @@ cfg_select! {
         pub(crate) use surface::Surface;
         pub(crate) use webview2::{CallerThread, PageWindow, Store, UiThread};
     }
-    any(
-        target_os = "linux",
-        target_os = "dragonfly",
-        target_os = "freebsd",
-        target_os = "netbsd",
-        target_os = "openbsd"
+    all(
+        feature = "webkitgtk",
+        any(
+            target_os = "linux",
+            target_os = "dragonfly",
+            target_os = "freebsd",
+            target_os = "netbsd",
+            target_os = "openbsd"
+        )
     ) => {
         mod webkitgtk;
         pub(crate) use webkitgtk::{CallerThread, Store, Surface, UiThread};
