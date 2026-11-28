@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ref: [diag-policy-only, diag-delivery-only]
+        ref: [diag-cover-full, diag-cover-plain]
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
