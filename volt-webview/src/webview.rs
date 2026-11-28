@@ -24,7 +24,13 @@ const CLOSE_GRACE: Duration = Duration::from_secs(3);
 /// Dropping the session closes its pages without waiting.
 ///
 /// On macOS every window lives on the main thread, so a call from another task is served only
-/// while the main thread runs an event loop or is itself inside one of this crate's awaits.
+/// while the main thread runs an event loop or is itself inside one of this crate's awaits. A
+/// program that runs no event loop there, as a terminal program is, can show a page to a person
+/// all the same: its first shown window makes it an accessory program, without a Dock icon or a
+/// menu bar, and comes in front of the other programs' windows. Such a window is redrawn and
+/// takes the mouse and the keyboard only while the main thread is inside one of this crate's
+/// awaits, so a wait on the page keeps it responding, the more smoothly the shorter
+/// [`Settings::poll`] is.
 ///
 /// Every failure is a [`volt_browser::Error`]; what only a webview can fail with is its
 /// [`Engine`](volt_browser::Error::Engine) kind, with the reason as its message. A failed load

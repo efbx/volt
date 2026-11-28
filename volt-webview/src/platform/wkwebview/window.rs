@@ -9,6 +9,7 @@ use objc2_foundation::{NSPoint, NSRect, NSSize, NSString, NSURL, ns_string};
 use wry::{WebView, WebViewBuilder, WebViewBuilderExtDarwin};
 
 use super::main_thread::NO_EVENT_LOOP;
+use super::program::Program;
 use crate::Error;
 
 /// The size a page's window opens with, in points.
@@ -93,15 +94,23 @@ impl PageWindow {
     }
 
     /// Puts the window in front of the program's other windows without making it key, so that
-    /// the keyboard focus stays where it is.
+    /// the keyboard focus stays where it is. In a program without an event loop of its own the
+    /// window also comes in front of the other programs' windows.
     pub(crate) fn reveal(&self) {
+        let program = Program::new(self.window.mtm());
+        program.admit();
         self.window.orderFront(None);
+        program.overtake(&self.window);
     }
 
     /// Puts the window in front of the program's other windows and makes it key, without
-    /// activating the program.
+    /// activating the program. In a program without an event loop of its own the window also
+    /// comes in front of the other programs' windows.
     pub(crate) fn show(&self) {
+        let program = Program::new(self.window.mtm());
+        program.admit();
         self.window.makeKeyAndOrderFront(None);
+        program.overtake(&self.window);
     }
 
     /// Takes the window off the screen.

@@ -22,7 +22,7 @@ Web APIs send `"tags": 5`, `"count": "12"`, `"enabled": "true"` and `"entries": 
 
 ```toml
 [dependencies]
-volt-coerce = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
+volt-coerce = { git = "https://github.com/efbx/volt", tag = "v0.6.2" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 ```

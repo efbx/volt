@@ -13,6 +13,7 @@ use objc2_core_foundation::{CFRunLoop, CFString};
 use tokio::sync::oneshot::{self, Sender};
 use tokio::time;
 
+use super::program::Program;
 use crate::Error;
 
 /// Why no session can start: nothing serves the main thread, where every window lives.
@@ -29,7 +30,7 @@ const SAMPLE: Duration = Duration::from_millis(20);
 const SLICE: f64 = 0.05;
 /// The name of the run loop's default mode, `kCFRunLoopDefaultMode`, which serves the main
 /// dispatch queue.
-const DEFAULT_MODE: &str = "kCFRunLoopDefaultMode";
+pub(super) const DEFAULT_MODE: &str = "kCFRunLoopDefaultMode";
 
 /// A session's state on the main thread, reached from any thread through jobs on the main
 /// dispatch queue, which the main thread's run loop serves.
@@ -86,12 +87,12 @@ impl<T: 'static> Drop for UiThread<T> {
 
 /// The thread a call is awaited on. When that is the main thread and no event loop runs there,
 /// as in a terminal program that awaits the call in `main`, it runs the main thread's run loop
-/// while it waits, which serves the call.
+/// while it waits, which serves the call, and hands the program's windows their events.
 pub(crate) struct CallerThread;
 
 impl CallerThread {
-    /// Waits for `future`, running the main thread's run loop between polls when this is the
-    /// main thread and nothing else runs that loop.
+    /// Waits for `future`, running the main thread's run loop and handing the windows their
+    /// events between polls when this is the main thread and nothing else runs that loop.
     pub(crate) async fn wait<F: Future>(future: F) -> F::Output {
         let mut future = pin!(future);
         poll_fn(|context| {
@@ -140,11 +141,16 @@ impl MainThread {
     }
 
     /// Runs the main thread's run loop in its default mode until one source has been handled,
-    /// the main dispatch queue included, or for a short slice at most.
+    /// the main dispatch queue included, or for a short slice at most, then hands the program's
+    /// windows the events queued for them, which the event loop this program does not run would
+    /// do.
     fn run_once() {
         autoreleasepool(|_| {
             let mode = CFString::from_static_str(DEFAULT_MODE);
             let _ = CFRunLoop::run_in_mode(Some(&mode), SLICE, true);
+            if let Some(mtm) = MainThreadMarker::new() {
+                Program::new(mtm).deliver_events();
+            }
         });
     }
 

@@ -2367,6 +2367,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d49e936b501e5c5bf01fda3a9452ff86dc3ea98ad5f283e1455153142d97518c"
 dependencies = [
  "bitflags",
+ "libc",
  "objc2",
  "objc2-core-foundation",
  "objc2-foundation",
@@ -3815,7 +3816,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "volt-browser"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -3833,7 +3834,7 @@ dependencies = [
 
 [[package]]
 name = "volt-browser-checks"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "http",
  "serde_json",
@@ -3843,7 +3844,7 @@ dependencies = [
 
 [[package]]
 name = "volt-chrome"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "chromiumoxide",
@@ -3858,7 +3859,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -3867,7 +3868,7 @@ dependencies = [
 
 [[package]]
 name = "volt-coerce-macros"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3876,7 +3877,7 @@ dependencies = [
 
 [[package]]
 name = "volt-creds"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "keyring",
@@ -3890,14 +3891,14 @@ dependencies = [
 
 [[package]]
 name = "volt-filex"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "volt-stringx",
 ]
 
 [[package]]
 name = "volt-http"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -3919,25 +3920,25 @@ dependencies = [
 
 [[package]]
 name = "volt-slicex"
-version = "0.6.1"
+version = "0.6.2"
 
 [[package]]
 name = "volt-stringx"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-templater"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "aho-corasick",
 ]
 
 [[package]]
 name = "volt-timestamp"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "chrono",
  "serde",
@@ -3947,7 +3948,7 @@ dependencies = [
 
 [[package]]
 name = "volt-webview"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "dispatch2",
@@ -3958,6 +3959,7 @@ dependencies = [
  "objc2",
  "objc2-app-kit",
  "objc2-core-foundation",
+ "objc2-core-graphics",
  "objc2-foundation",
  "serde_json",
  "soup3",

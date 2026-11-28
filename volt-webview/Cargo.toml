@@ -28,7 +28,7 @@ wry = { workspace = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 dispatch2 = { workspace = true }
 objc2 = { workspace = true }
-objc2-app-kit = { workspace = true, features = ["NSApplication", "NSResponder", "NSView", "NSViewController", "NSWindow", "NSWindowRestoration"] }
+objc2-app-kit = { workspace = true, features = ["NSApplication", "NSEvent", "NSResponder", "NSRunningApplication", "NSView", "NSViewController", "NSWindow", "NSWindowRestoration"] }
 objc2-core-foundation = { workspace = true, features = ["CFDate", "CFRunLoop", "CFString"] }
 objc2-foundation = { workspace = true, features = ["NSGeometry", "NSString", "NSURL"] }
 
@@ -50,6 +50,9 @@ volt-http = { workspace = true, features = ["browser"] }
 wreq = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
+objc2-app-kit = { workspace = true, features = ["NSScreen", "NSWorkspace", "libc"] }
+objc2-core-graphics = { workspace = true, features = ["CGEvent", "CGEventTypes"] }
+objc2-foundation = { workspace = true, features = ["NSArray", "NSEnumerator"] }
 tao = { workspace = true }
 
 [[test]]

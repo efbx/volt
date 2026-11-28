@@ -77,7 +77,7 @@ jobs:
         run: ${{ matrix.display }} cargo test -p volt-webview -- --ignored --skip shown
       - name: Webview with shown windows
         if: ${{ !cancelled() }}
-        run: ${{ matrix.display }} cargo test -p volt-webview --test window -- --ignored shown
+        run: ${{ matrix.display }} cargo test -p volt-webview --test window --test main_thread -- --ignored shown
 
   minimum:
     runs-on: ubuntu-latest

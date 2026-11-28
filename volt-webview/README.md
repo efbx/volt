@@ -19,8 +19,8 @@ There is no helper process and nothing to call in `main`. Windows and webviews m
 
 ```toml
 [dependencies]
-volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
-volt-webview = { git = "https://github.com/efbx/volt", tag = "v0.6.1" }
+volt-browser = { git = "https://github.com/efbx/volt", tag = "v0.6.2" }
+volt-webview = { git = "https://github.com/efbx/volt", tag = "v0.6.2" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
 ```
 
@@ -28,7 +28,7 @@ Requires Rust 1.95 or newer. `Webview::launch` must be awaited inside a Tokio ru
 
 ## Platform requirements
 
-- **macOS**: the main thread must run an event loop, as every program with a window does, or await the call itself, as a terminal program does in the body of `#[tokio::main]`. Anywhere else `Webview::launch` fails within a second, with the `Engine` kind.
+- **macOS**: the main thread must run an event loop, as every program with a window does, or await the call itself, as a terminal program does in the body of `#[tokio::main]`. Anywhere else `Webview::launch` fails within a second, with the `Engine` kind. A terminal program can show a page to a person too: the window comes in front of the other programs' windows, and it is redrawn and takes the mouse and the keyboard while the main thread awaits a call of this crate, so a wait on the page keeps it responding, the more smoothly the shorter `Settings::poll` is.
 - **Windows**: Windows 10 or later with the WebView2 Runtime, which Windows 11 includes. Each session runs a window thread of its own. Programs built for a `*-windows-gnu` target need `WebView2Loader.dll` next to the executable.
 - **Linux and the BSDs**: WebKitGTK 4.1, version 2.40 or newer, GTK 3 and a display, with `libwebkit2gtk-4.1-dev` and `libgtk-3-dev` to build. A program that runs GTK itself must start it before the first session; otherwise the crate starts a GTK thread of its own.
 
@@ -71,7 +71,7 @@ async fn sign_in(user: &str, password: &str) -> Result<Vec<String>, Error> {
 
 ## Tests
 
-The tests that open real webview windows are ignored by default: `cargo test -p volt-webview -- --ignored` runs them, with a display on Linux and the BSDs, and `--skip shown` keeps every window hidden.
+The tests that open real webview windows are ignored by default: `cargo test -p volt-webview -- --ignored` runs them, with a display on Linux and the BSDs, and `--skip shown` keeps every window hidden. One macOS test clicks in a shown window through the system itself, which takes over the pointer, so it runs only on a GitHub runner.
 
 ## License
 
