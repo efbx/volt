@@ -2,7 +2,7 @@ use volt_browser::{
     Blocker, By, Choice, Click, Error, Keystroke, Match, Modifiers, NamedKey, Point, Session, State,
 };
 
-use super::checks::{BRIEF, Checks, Flaw, Outcome};
+use super::checks::{BRIEF, Checks, Flaw, Outcome, SETTLED};
 use super::site::Site;
 
 /// The function that lists the values of a `<select>`'s chosen options.
@@ -421,7 +421,7 @@ impl Checks {
         page.close().await?;
 
         let page = Self::open(session, site, "/late").await?;
-        let under = page.find(By::id("under")).timeout(BRIEF).click().await;
+        let under = page.find(By::id("under")).timeout(SETTLED).click().await;
         Flaw::expect(
             "covered",
             &under,

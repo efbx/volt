@@ -8,6 +8,11 @@ use super::site::Site;
 /// The most a command waits in a check that expects it to fail.
 pub(super) const BRIEF: Duration = Duration::from_millis(300);
 
+/// The most a command waits in a check that expects it to fail for a reason the page can give
+/// only after two looks, as it does for a covered element, which has to be seen holding still
+/// first: on a busy machine the first look alone can outlast [`BRIEF`].
+pub(super) const SETTLED: Duration = Duration::from_secs(2);
+
 /// What a check gives: nothing, or why it did not hold.
 pub(super) type Outcome = Result<(), Flaw>;
 
