@@ -50,6 +50,9 @@ volt-http = { workspace = true, features = ["browser"] }
 wreq = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
+objc2-app-kit = { workspace = true, features = ["NSRunningApplication", "NSScreen"] }
+objc2-core-graphics = { workspace = true, features = ["CGEvent", "CGEventTypes"] }
+objc2-foundation = { workspace = true, features = ["NSArray", "NSEnumerator"] }
 tao = { workspace = true }
 
 [[test]]
